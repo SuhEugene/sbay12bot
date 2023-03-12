@@ -44,8 +44,28 @@ bot.once("ready", async () => {
   //  await bot.clearApplicationCommands(
   //    ...bot.guilds.cache.map((g) => g.id)
   //  );
+  if (!bot.user || !bot.user.id)
+    throw Error("Who am i?")
 
-  console.log("Bot started");
+  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
+  if (!guild || !guild.id)
+    throw Error(`Environment guild REPORT_GUILD (${process.env["REPORT_GUILD"]}) does not exist!`)
+
+  const channel = await guild.channels.fetch(process.env["REPORT_CHANNEL"] as string);
+  if (!channel || !channel.id)
+    throw Error(`Environment channel REPORT_CHANNEL (${process.env["REPORT_CHANNEL"]}) does not exist!`)
+
+  console.log(
+    "=============\n"+
+    " Bot started\n"+
+    "============="
+  );
+  console.log(` Logged in as:   ${bot.user.tag} [${bot.user.id}]`);
+  console.log(` Report guild:   ${guild.name} [${guild.id}]`);
+  console.log(` Report channel: #${channel.name} [${channel.id}]`);
+  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}`);
+
+  console.log("=============");
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {
