@@ -12,5 +12,5 @@ export async function sendToReportsChannel(interaction: BaseInteraction, options
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"]);
   const channel = await guild.channels.fetch(process.env["REPORT_CHANNEL"]) as TextChannel;
 
-  channel.send(options)
+  return await channel.send(options);
 }
