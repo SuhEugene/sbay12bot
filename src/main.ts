@@ -22,7 +22,7 @@ export const bot = new Client({
   ],
 
   // Debug logs are disabled in silent mode
-  silent: false,
+  silent: process.env["NODE_ENV"] == "production",
 
   // Configuration for @SimpleCommand
   simpleCommand: {
