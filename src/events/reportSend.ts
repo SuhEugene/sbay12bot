@@ -21,7 +21,9 @@ export class ReportSend {
   async sendReport(interaction: ButtonInteraction) {
     const session = shared.reportSessions[interaction.user.id];
     const text = sessionToText(session);
-    const body = text+githubBodyFooter.replace("${}", interaction.user.tag+"/"+interaction.user.id);
+    const body = text+githubBodyFooter
+      .replace("${user}", interaction.user.tag)
+      .replace("${id}", interaction.user.id);
 
     if (!process.env["REPORT_REPO"])
       throw Error("Could not find REPORT_REPO in your environment")
@@ -42,8 +44,8 @@ export class ReportSend {
     const embed = new EmbedBuilder()
       .setColor("#85bab6")
       .setTitle(`${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`)
-      .setDescription(text + `\n---\n[Открыть issue #${issue.data.id}](${issue.data.html_url})`)
-      .setURL(issue.data.url)
+      .setDescription(text)
+      .setURL(issue.data.html_url)
       .setAuthor({
         name: interaction.user.tag,
         iconURL: interaction.user.avatarURL() || undefined

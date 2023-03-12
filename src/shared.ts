@@ -73,7 +73,7 @@ export const shared: sharedType = {
   octokit: null
 }
 
-export const githubBodyFooter = "\n<hr>\n\n*Это сообщение сгенерировано автоматически*\n*Автор оригинального репорта: `${}`*";
+export const githubBodyFooter = "\n<hr>\n\n*Репорт сгенерирован автоматически*\n*Автор репорта: `${user}` / `${id}`*";
 
 export const reportAddInfoPresentTypes = [ ReportType.Mechanics, ReportType.Object, ReportType.Sprite ]
 
