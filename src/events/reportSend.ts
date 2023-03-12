@@ -1,5 +1,5 @@
 import { RateLimit, TIME_UNIT } from "@discordx/utilities";
-import { ButtonInteraction, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder } from "discord.js";
 import { ButtonComponent, Discord, Guard } from "discordx";
 import { HasSession } from "../sessionGuard.js";
 import { ButtonId, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
@@ -41,6 +41,8 @@ export class ReportSend {
       // ephemeral: true
     });
 
+    delete shared.reportSessions[interaction.user.id];
+    
     const embed = new EmbedBuilder()
       .setColor("#85bab6")
       .setTitle(`${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`)
@@ -51,12 +53,22 @@ export class ReportSend {
         iconURL: interaction.user.avatarURL() || undefined
       }).setTimestamp()
 
-    await sendToReportsChannel(interaction, { embeds: [ embed ] });
+    const githubButton = new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setURL(issue.data.html_url)
+      .setLabel(`GitHub Issue #${issue.data.number}`)
+    
+    const githubRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(githubButton);
 
-    delete shared.reportSessions[interaction.user.id];
+    const msg = await sendToReportsChannel(interaction, {
+      embeds: [ embed ], components: [ githubRow ]
+    });
 
     return await replyToInteraction(interaction, {
-      content: "Репорт отправлен\n"+issue.data.html_url,
+      content:
+        "**Репорт отправлен!**\n"+
+        `- Ссылка на GitHub: ${issue.data.html_url}\n`+
+        `- Копия в дискорде: ${msg.url}`,
       embeds: [ embed ]
       // ephemeral: true
     });
