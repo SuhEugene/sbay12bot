@@ -12,7 +12,7 @@ export async function onReportModal(interaction: ModalSubmitInteraction, type?: 
     if (type !== null && type !== undefined) session = { type, [ReportFieldId.Title]: reportFields[ReportFieldId.Title] };
     else return await replyToInteraction(interaction, {
       content: "Невозможно создать сессию",
-      // ephemeral: true
+      ephemeral: true
     });
   }
 
@@ -34,6 +34,6 @@ export async function onReportModal(interaction: ModalSubmitInteraction, type?: 
   return await replyToInteraction(interaction, {
     embeds: [ embed ],
     components: [ sendOrAddInfoReportRow ],
-    // ephemeral: true
+    ephemeral: true
   });
 }

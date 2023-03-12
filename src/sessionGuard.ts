@@ -8,8 +8,8 @@ export const HasNoSession: GuardFunction<CommandInteraction | SimpleCommandMessa
 
   if (shared.reportSessions[interaction.user.id])
     return await replyToInteraction(interaction, {
-      // ephemeral: true,
-      content: "Предыдущий репорт ещё не отправлен\nНеобходимо его отправить, прежде чем начинать новый"
+      content: "Предыдущий репорт ещё не отправлен\nНеобходимо его отправить, прежде чем начинать новый",
+      ephemeral: true
     });
   
   return await next();
@@ -20,8 +20,8 @@ export const HasSession: GuardFunction<CommandInteraction | SimpleCommandMessage
 
   if (!shared.reportSessions[interaction.user.id])
     return await replyToInteraction(interaction, {
-      // ephemeral: true,
-      content: "Сессия не найдена"
+      content: "Сессия не найдена",
+      ephemeral: true
     });
   
   return await next();

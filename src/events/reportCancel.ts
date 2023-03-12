@@ -11,8 +11,8 @@ export class ReportCancel {
   async cancelReport(interaction: ButtonInteraction) {
     delete shared.reportSessions[interaction.user.id];
     return await replyToInteraction(interaction, {
-      content: "Отменено",
-      // ephemeral: true
+      content: "Сессия очищена",
+      ephemeral: true
     });
   }
 }

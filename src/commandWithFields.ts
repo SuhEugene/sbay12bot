@@ -2,6 +2,7 @@ import { CommandInteraction, InteractionResponse, Message, ModalBuilder, ModalSu
 import { onReportModal } from "./events/onReportModal.js";
 import { ReportFieldOptions, reportTitleSuffixes, ReportType, reportTypeToModalId } from "./shared.js";
 import { fieldsToRows } from "./utils/fieldOps.js";
+import { sendError } from "./utils/sendError.js";
 
 export class CommandWithFields {
 
@@ -44,7 +45,11 @@ export class CommandWithFields {
     
     modal.addComponents(...fieldsToRows(self.createFields()));
 
-    return await interaction.showModal(modal);
+    try {
+      return await interaction.showModal(modal);
+    } catch (e) {
+      return await sendError(interaction, e);
+    }
   }
 
   async onModal(interaction: ModalSubmitInteraction) {
@@ -53,6 +58,6 @@ export class CommandWithFields {
     if (self.commandType === null)
       throw Error("Command type not specified");
       
-    return onReportModal(interaction, self.commandType);
+    return await onReportModal(interaction, self.commandType);
   }
 }

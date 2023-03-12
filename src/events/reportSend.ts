@@ -4,6 +4,7 @@ import { ButtonComponent, Discord, Guard } from "discordx";
 import { HasSession } from "../sessionGuard.js";
 import { ButtonId, EMBED_COLOR, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
 import { replyToInteraction } from "../utils/reply.js";
+import { sendError } from "../utils/sendError.js";
 import { sendToReportsChannel } from "../utils/sendToReportsChannel.js";
 import { sessionToText } from "../utils/sessionToText.js";
 
@@ -30,15 +31,21 @@ export class ReportSend {
 
     const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
 
-    const issue = await shared.octokit?.issues.create({
-      owner, repo, body,
-      title: `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`,
-      // milestone: 3
-    });
+    let issue;
+
+    try {
+      issue = await shared.octokit?.issues.create({
+        owner, repo, body,
+        title: `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`,
+        milestone: process.env["REPORT_MILESTONE"] || null
+      });
+    } catch (e) {
+      return await sendError(interaction, e);
+    } 
 
     if (!issue) return await replyToInteraction(interaction, {
       content: "Ошибка!\nРепорт не отправлен",
-      // ephemeral: true
+      ephemeral: true
     });
 
     delete shared.reportSessions[interaction.user.id];
@@ -69,8 +76,8 @@ export class ReportSend {
         "**Репорт отправлен!**\n"+
         `- Ссылка на GitHub: ${issue.data.html_url}\n`+
         `- Копия в дискорде: ${msg.url}`,
-      embeds: [ embed ]
-      // ephemeral: true
+      embeds: [ embed ],
+      ephemeral: true
     });
   }
 }
