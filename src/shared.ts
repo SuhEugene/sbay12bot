@@ -74,8 +74,8 @@ export const shared: sharedType = {
 }
 
 export const githubBodyFooter = "\n<hr>\n\n*Репорт сгенерирован автоматически*\n*Автор: `${user}` / `${id}`*";
-
-export const reportAddInfoPresentTypes = [ ReportType.Mechanics, ReportType.Object, ReportType.Sprite ]
+export const reportAddInfoPresentTypes = [ ReportType.Mechanics, ReportType.Object, ReportType.Sprite ];
+export const EMBED_COLOR = "#20365a";
 
 export enum ModalId {
   ReportObject = "modal-report-object",

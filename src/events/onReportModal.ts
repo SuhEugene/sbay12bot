@@ -1,5 +1,5 @@
 import { EmbedBuilder, ModalSubmitInteraction } from "discord.js";
-import { ReportFieldId, reportTitlePrefixes, ReportType, ReportTypedData, sendOrAddInfoReportRow, shared } from "../shared.js";
+import { EMBED_COLOR, ReportFieldId, reportTitlePrefixes, ReportType, ReportTypedData, sendOrAddInfoReportRow, shared } from "../shared.js";
 import { replyToInteraction } from "../utils/reply.js";
 import { sessionToText } from "../utils/sessionToText.js";
 
@@ -24,7 +24,7 @@ export async function onReportModal(interaction: ModalSubmitInteraction, type?: 
 
   shared.reportSessions[interaction.user.id] = session;
 
-  const embed = new EmbedBuilder().setColor("#85bab6");
+  const embed = new EmbedBuilder().setColor(EMBED_COLOR);
 
   session[ReportFieldId.Title] &&
     embed.setTitle(`${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`);

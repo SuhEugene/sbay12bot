@@ -2,7 +2,7 @@ import { RateLimit, TIME_UNIT } from "@discordx/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder } from "discord.js";
 import { ButtonComponent, Discord, Guard } from "discordx";
 import { HasSession } from "../sessionGuard.js";
-import { ButtonId, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
+import { ButtonId, EMBED_COLOR, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
 import { replyToInteraction } from "../utils/reply.js";
 import { sendToReportsChannel } from "../utils/sendToReportsChannel.js";
 import { sessionToText } from "../utils/sessionToText.js";
@@ -44,7 +44,7 @@ export class ReportSend {
     delete shared.reportSessions[interaction.user.id];
     
     const embed = new EmbedBuilder()
-      .setColor("#85bab6")
+      .setColor(EMBED_COLOR)
       .setTitle(`${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`)
       .setDescription(text)
       .setURL(issue.data.html_url)
