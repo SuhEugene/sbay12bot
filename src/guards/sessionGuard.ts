@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import type { GuardFunction, SimpleCommandMessage } from "discordx"
-import { shared } from "./shared.js";
-import { replyToInteraction } from "./utils/reply.js";
+import { shared } from "../shared.js";
+import { replyToInteraction } from "../utils/reply.js";
 
 export const HasNoSession: GuardFunction<CommandInteraction | SimpleCommandMessage> = async (arg, client, next) => {
   const interaction = arg instanceof Array ? arg[0] : arg;

@@ -2,13 +2,15 @@ import { NotBot } from "@discordx/utilities";
 import { CommandInteraction, ModalSubmitInteraction } from "discord.js";
 import { Discord, Guard, ModalComponent, Slash, SlashGroup } from "discordx";
 import { CommandWithFields } from "../commandWithFields.js";
-import { HasNoSession } from "../sessionGuard.js";
+import { HasMinionRole } from "../guards/hasMinionRole.js";
+import { HasNoSession } from "../guards/sessionGuard.js";
 import { ModalId, ReportFieldId, ReportFieldOptions, ReportType } from "../shared.js";
 
 @Discord()
 @Guard(
   NotBot,
-  HasNoSession
+  HasNoSession,
+  HasMinionRole
 )
 @SlashGroup("репорт")
 export class ReportObjectCommand extends CommandWithFields {

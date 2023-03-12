@@ -54,6 +54,10 @@ bot.once("ready", async () => {
   const channel = await guild.channels.fetch(process.env["REPORT_CHANNEL"] as string);
   if (!channel || !channel.id)
     throw Error(`Environment channel REPORT_CHANNEL (${process.env["REPORT_CHANNEL"]}) does not exist!`)
+  
+  const minion = await guild.roles.fetch(process.env["MINION_ROLE"] as string);
+  if (!minion || !minion.id)
+    throw Error(`Environment role MINION_ROLE (${process.env["MINION_ROLE"]}) does not exist!`)
 
   console.log(
     "=============\n"+
@@ -64,6 +68,7 @@ bot.once("ready", async () => {
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
   console.log(` Report channel: #${channel.name} [${channel.id}]`);
   console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}`);
+  console.log(` Minion role:    ${minion.name} [${channel.id}]`);
 
   console.log("=============");
 });
@@ -99,6 +104,9 @@ async function run() {
     
   if (!process.env["REPORT_REPO"])
     throw Error("Could not find REPORT_REPO in your environment")
+
+  if (!process.env["MINION_ROLE"])
+    throw Error("Could not find MINION_ROLE in your environment")
 
   shared.octokit = new Octokit({
     auth: process.env["GIT_TOKEN"]

@@ -1,7 +1,7 @@
 import { RateLimit, TIME_UNIT } from "@discordx/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder } from "discord.js";
 import { ButtonComponent, Discord, Guard } from "discordx";
-import { HasSession } from "../sessionGuard.js";
+import { HasSession } from "../guards/sessionGuard.js";
 import { ButtonId, EMBED_COLOR, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
 import { replyToInteraction } from "../utils/reply.js";
 import { sendError } from "../utils/sendError.js";

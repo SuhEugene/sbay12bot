@@ -1,6 +1,6 @@
 import type { ButtonInteraction } from "discord.js";
 import { ButtonComponent, Discord, Guard } from "discordx";
-import { HasSession } from "../sessionGuard.js";
+import { HasSession } from "../guards/sessionGuard.js";
 import { ButtonId, shared } from "../shared.js";
 import { replyToInteraction } from "../utils/reply.js";
 
