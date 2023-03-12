@@ -6,12 +6,11 @@ import { HasNoSession } from "../sessionGuard.js";
 import { ModalId, ReportFieldId, ReportFieldOptions, ReportType } from "../shared.js";
 
 @Discord()
-@SlashGroup({ description: "Различного рода репорты по SierraBay12", name: "репорт" })
-@SlashGroup("репорт")
 @Guard(
   NotBot,
   HasNoSession
 )
+@SlashGroup("репорт")
 export class ReportSpriteCommand extends CommandWithFields {
 
   static commandType: ReportType = ReportType.Sprite;
