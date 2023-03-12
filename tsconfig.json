@@ -9,10 +9,13 @@
     "allowSyntheticDefaultImports": true,
 
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
+    "importHelpers": true,
 
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true
   },
+  "include": ["src", "**/*.ts"],
   "exclude": ["build", "node_modules"]
 }
