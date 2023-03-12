@@ -9,7 +9,7 @@ config();
 
 export const bot = new Client({
   // To use only guild command
-  botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+  botGuilds: [process.env["REPORT_GUILD"] as string, "946712507874152488"],
 
   // Discord intents
   intents: [
