@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, Role } from "discord.js";
 import { GuardFunction } from "discordx";
-import { replyToInteraction } from "../utils/reply";
-import { sendError } from "../utils/sendError";
+import { replyToInteraction } from "../utils/reply.js";
+import { sendError } from "../utils/sendError.js";
 
 export const HasMinionRole: GuardFunction<CommandInteraction> = async (arg, client, next) => {
   const interaction: CommandInteraction = arg instanceof Array ? arg[0] : arg;
