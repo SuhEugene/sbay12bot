@@ -29,7 +29,7 @@ export function sessionToText(session: ReportTypedData): string {
     textArr.push(getReplaced(session, arg as ReportFieldId))
   }
 
-  if (session.type != ReportType.Bug) {
+  if (session.type != ReportType.Bug && session[ReportFieldId.AdditionalInfo]) {
     const r = getReplaced(session, ReportFieldId.AdditionalInfo, true);
     r && textArr.push(r);
   }

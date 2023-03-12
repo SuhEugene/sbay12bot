@@ -49,10 +49,12 @@ export class ReportSend {
     });
 
     delete shared.reportSessions[interaction.user.id];
+
+    const reportTitle = `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`;
     
     const embed = new EmbedBuilder()
       .setColor(EMBED_COLOR)
-      .setTitle(`${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`)
+      .setTitle(reportTitle)
       .setDescription(text)
       .setURL(issue.data.html_url)
       .setAuthor({
@@ -64,18 +66,33 @@ export class ReportSend {
       .setStyle(ButtonStyle.Link)
       .setURL(issue.data.html_url)
       .setLabel(`GitHub Issue #${issue.data.number}`)
-    
+
     const githubRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(githubButton);
 
     const msg = await sendToReportsChannel(interaction, {
       embeds: [ embed ], components: [ githubRow ]
     });
 
+    const thread = await msg.startThread({
+      name: reportTitle.slice(0, 100),
+      reason: `Открытие GitHub Issue ${process.env["REPORT_REPO"]}#${issue.data.number}`
+    })
+
+    try {
+      await shared.octokit?.issues.createComment({
+        owner, repo, issue_number: issue.data.number,
+        body: `### [Обсуждение в Discord](${thread.url})`
+      })
+    } catch (e) {
+      console.error("UNCATCHED! ERROR", e);
+    }
+
     return await replyToInteraction(interaction, {
       content:
         "**Репорт отправлен!**\n"+
         `- Ссылка на GitHub: ${issue.data.html_url}\n`+
-        `- Копия в дискорде: ${msg.url}`,
+        `- Копия в дискорде: ${msg.url}\n`+
+        `- Обсуждение: <#${thread.id}>`,
       embeds: [ embed ],
       ephemeral: true
     });
