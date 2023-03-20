@@ -105,8 +105,8 @@ async function run() {
   if (!process.env["REPORT_REPO"])
     throw Error("Could not find REPORT_REPO in your environment")
 
-  if (!process.env["MINION_ROLE"])
-    throw Error("Could not find MINION_ROLE in your environment")
+  if (!process.env["ALLOWED_ROLES"])
+    throw Error("Could not find ALLOWED_ROLES in your environment")
 
   shared.octokit = new Octokit({
     auth: process.env["GIT_TOKEN"]

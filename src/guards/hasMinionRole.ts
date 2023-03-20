@@ -3,28 +3,38 @@ import { GuardFunction } from "discordx";
 import { replyToInteraction } from "../utils/reply.js";
 import { sendError } from "../utils/sendError.js";
 
+const toRole = (id: string): string => `<@&${id}>`;
+
 export const HasMinionRole: GuardFunction<CommandInteraction> = async (arg, client, next) => {
   const interaction: CommandInteraction = arg instanceof Array ? arg[0] : arg;
 
   if (!interaction.member || !interaction.guild) return;
-  if (!process.env["MINION_ROLE"])
-    throw Error(`Environment role MINION_ROLE (${process.env["MINION_ROLE"]}) does not exist!`);
+  if (!process.env["ALLOWED_ROLES"])
+    throw Error(`Environment role MINION_ROLE (${process.env["ALLOWED_ROLES"]}) does not exist!`);
+
+  const roles = process.env["ALLOWED_ROLES"].split(/; */);
 
   let mbr: GuildMember | null = null;
-  let role: Role | null = null;
   try {
     mbr = await interaction.guild.members.fetch(interaction.user.id);
-    role = await interaction.guild.roles.fetch(process.env["MINION_ROLE"]);
   } catch (e) {
     return await sendError(interaction, e);
   }
   if (!mbr || !mbr.id) return;
-  if (!role || !role.id) return;
-  
-  if (!mbr.roles.cache.has(role.id))
+
+  let hasAnyRole = false;
+  for (const role of roles) {
+    if (!mbr.roles.cache.has(role)) continue;
+    hasAnyRole = true;
+    break;
+  }
+
+  const sep = "\n- ";
+  if (!hasAnyRole)
     return await replyToInteraction(interaction, {
-      content: `Репорт может сделать только обладатель роли \`${role.name}\``,
-      ephemeral: true
+      content: `Репорт может сделать только обладатель одной из ролей:${sep}${roles.map(toRole).join(sep)}`,
+      ephemeral: true,
+      allowedMentions: { parse: [] }
     });
   
   return await next();
