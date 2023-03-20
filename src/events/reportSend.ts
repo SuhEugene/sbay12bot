@@ -2,7 +2,8 @@ import { RateLimit, TIME_UNIT } from "@discordx/utilities";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder } from "discord.js";
 import { ButtonComponent, Discord, Guard } from "discordx";
 import { HasSession } from "../guards/sessionGuard.js";
-import { ButtonId, EMBED_COLOR, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
+import { ButtonId, EMBED_COLOR_DEFAULT, githubBodyFooter, ReportFieldId, reportLabels, reportTitlePrefixes, shared } from "../shared.js";
+import { readReports, reportsMap, writeReports } from "../utils/githubReports.js";
 import { editOrReply, replyToInteraction } from "../utils/reply.js";
 import { sendError } from "../utils/sendError.js";
 import { sendToReportsChannel } from "../utils/sendToReportsChannel.js";
@@ -13,7 +14,7 @@ const EMOJI = "<a:catChat:856958810110033930>";
 const statusMessage = async (interaction: ButtonInteraction, text: string) => {
   const waitEmbed = new EmbedBuilder()
       .setTitle(`${EMOJI} ${text}`)
-      .setColor(EMBED_COLOR);
+      .setColor(EMBED_COLOR_DEFAULT);
 
   await editOrReply(interaction, {
     components: [],
@@ -34,6 +35,9 @@ export class ReportSend {
   )
   @ButtonComponent({ id: ButtonId.ReportSend })
   async sendReport(interaction: ButtonInteraction) {
+    
+    await statusMessage(interaction, "Обновление репортов...");
+    readReports();
 
     await statusMessage(interaction, "Создание репорта на GitHub...");
 
@@ -54,7 +58,8 @@ export class ReportSend {
       issue = await shared.octokit?.issues.create({
         owner, repo, body,
         title: `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`,
-        milestone: process.env["REPORT_MILESTONE"] || null
+        milestone: process.env["REPORT_MILESTONE"] || null,
+        labels: [reportLabels[session.type]]
       });
     } catch (e) {
       return await sendError(interaction, e);
@@ -72,7 +77,7 @@ export class ReportSend {
     const reportTitle = `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`;
     
     const embed = new EmbedBuilder()
-      .setColor(EMBED_COLOR)
+      .setColor(EMBED_COLOR_DEFAULT)
       .setTitle(reportTitle)
       .setDescription(text)
       .setURL(issue.data.html_url)
@@ -91,6 +96,11 @@ export class ReportSend {
     const msg = await sendToReportsChannel(interaction, {
       embeds: [ embed ], components: [ githubRow ]
     });
+
+    await statusMessage(interaction, "Привязка репорта...");
+
+    reportsMap.set(issue.data.number, msg.id);
+    writeReports();
 
     await statusMessage(interaction, "Открытие обсуждения...");
 
