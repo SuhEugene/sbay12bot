@@ -1,12 +1,13 @@
 import { readFileSync, writeFileSync } from "fs";
 import path from "path";
+import { cwd } from "process";
+
+
+const filePath = path.join(cwd(), "src", "data", "reports.json");
 
 export const reportsMap = new Map<number, string>();
 
 export async function readReports() {
-  const there = import.meta.url;
-  const filePath = path.resolve(path.dirname(there), "..", "data", "reports.json");
-
   let reportsString = "";
   try {
     reportsString = String(readFileSync(filePath));
@@ -14,7 +15,9 @@ export async function readReports() {
     reportsString = "{}";
   }
 
-  const reportsJson = JSON.parse(reportsString);
+  let reportsJson: {[index: string]: string} = {};
+  try { reportsJson = JSON.parse(reportsString); }
+  catch (e) { console.error("CANNOT PARSE", e); }
   for (const reportId in reportsJson)
     reportsMap.set(Number(reportId), reportsJson[reportId]);
 
@@ -22,9 +25,6 @@ export async function readReports() {
 }
 
 export async function writeReports() {
-  const there = import.meta.url;
-  const filePath = path.resolve(path.dirname(there), "..", "data", "reports.json");
-
   let reportsJson: {[index: string]: string} = {};
   for (const [key, value] of reportsMap)
     reportsJson[String(key)] = value;
