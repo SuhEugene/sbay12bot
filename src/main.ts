@@ -5,6 +5,7 @@ import { Client } from "discordx";
 import { config } from "dotenv";
 import { Octokit } from "@octokit/rest";
 import { shared } from "./shared.js";
+import { readReports } from "./utils/githubReports.js";
 config();
 
 export const bot = new Client({
@@ -64,6 +65,9 @@ bot.once("ready", async () => {
 
   const mstone = process.env["REPORT_MILESTONE"];
 
+  console.log("Reading reports...");
+  readReports();
+
   console.log(
     "=============\n"+
     " Bot started\n"+
@@ -94,11 +98,6 @@ bot.on("messageCreate", (message: Message) => {
 });
 
 async function run() {
-  // The following syntax should be used in the commonjs environment
-  //
-  // await importx(__dirname + "/{events,commands}/**/*.{ts,js}");
-
-  // The following syntax should be used in the ECMAScript environment
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
   // Let's start the bot
