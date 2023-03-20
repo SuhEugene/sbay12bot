@@ -17,7 +17,8 @@ const statusMessage = async (interaction: ButtonInteraction, text: string) => {
 
   await editOrReply(interaction, {
     components: [],
-    embeds: [ waitEmbed ]
+    embeds: [ waitEmbed ],
+    ephemeral: true
   })
 }
 
