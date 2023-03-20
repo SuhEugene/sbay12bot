@@ -55,9 +55,12 @@ bot.once("ready", async () => {
   if (!channel || !channel.id)
     throw Error(`Environment channel REPORT_CHANNEL (${process.env["REPORT_CHANNEL"]}) does not exist!`)
   
-  const minion = await guild.roles.fetch(process.env["MINION_ROLE"] as string);
-  if (!minion || !minion.id)
-    throw Error(`Environment role MINION_ROLE (${process.env["MINION_ROLE"]}) does not exist!`)
+  if (!process.env["ALLOWED_ROLES"])
+    throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) does not exist!`)
+
+  const allowedRoles = process.env["ALLOWED_ROLES"].split(/; */);
+  if (!allowedRoles.length)
+    throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) is empty!`)
 
   console.log(
     "=============\n"+
@@ -68,7 +71,14 @@ bot.once("ready", async () => {
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
   console.log(` Report channel: #${channel.name} [${channel.id}]`);
   console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}`);
-  console.log(` Minion role:    ${minion.name} [${channel.id}]`);
+
+  console.log(` Allowed roles:`);
+  for (const roleId of allowedRoles) {
+    const role = await guild.roles.fetch(roleId);
+    if (!role)
+      throw Error(`Role ${roleId} does not exist on this guild`);
+    console.log(` - ${role.name} [${role.id}]`);
+  }
 
   console.log("=============");
 });
