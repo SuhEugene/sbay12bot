@@ -1,11 +1,15 @@
 import { readFileSync, writeFileSync } from "fs";
+import path from "path";
 
 export const reportsMap = new Map<number, string>();
 
 export async function readReports() {
+  const there = import.meta.url;
+  const filePath = path.resolve(path.dirname(there), "..", "data", "reports.json");
+
   let reportsString = "";
   try {
-    reportsString = String(readFileSync("../data/reports.json"));
+    reportsString = String(readFileSync(filePath));
   } catch (e) {
     reportsString = "{}";
   }
@@ -18,9 +22,12 @@ export async function readReports() {
 }
 
 export async function writeReports() {
+  const there = import.meta.url;
+  const filePath = path.resolve(path.dirname(there), "..", "data", "reports.json");
+
   let reportsJson: {[index: string]: string} = {};
   for (const [key, value] of reportsMap)
     reportsJson[String(key)] = value;
 
-  writeFileSync("../data/reports.json", JSON.stringify(reportsJson));  
+  writeFileSync(filePath, JSON.stringify(reportsJson));  
 }
