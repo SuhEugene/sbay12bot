@@ -34,7 +34,7 @@ export class ReportSend {
   )
   @ButtonComponent({ id: ButtonId.ReportSend })
   async sendReport(interaction: ButtonInteraction) {
-    
+
     await statusMessage(interaction, "Создание репорта на GitHub...");
 
     const session = shared.reportSessions[interaction.user.id];
