@@ -3,10 +3,23 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedB
 import { ButtonComponent, Discord, Guard } from "discordx";
 import { HasSession } from "../guards/sessionGuard.js";
 import { ButtonId, EMBED_COLOR, githubBodyFooter, ReportFieldId, reportTitlePrefixes, shared } from "../shared.js";
-import { replyToInteraction } from "../utils/reply.js";
+import { editOrReply, replyToInteraction } from "../utils/reply.js";
 import { sendError } from "../utils/sendError.js";
 import { sendToReportsChannel } from "../utils/sendToReportsChannel.js";
 import { sessionToText } from "../utils/sessionToText.js";
+
+const EMOJI = "<a:catChat:856958810110033930>";
+
+const statusMessage = async (interaction: ButtonInteraction, text: string) => {
+  const waitEmbed = new EmbedBuilder()
+      .setTitle(`${EMOJI} ${text}`)
+      .setColor(EMBED_COLOR);
+
+  await editOrReply(interaction, {
+    components: [],
+    embeds: [ waitEmbed ]
+  })
+}
 
 @Discord()
 export class ReportSend {
@@ -20,6 +33,9 @@ export class ReportSend {
   )
   @ButtonComponent({ id: ButtonId.ReportSend })
   async sendReport(interaction: ButtonInteraction) {
+    
+    await statusMessage(interaction, "Создание репорта на GitHub...");
+
     const session = shared.reportSessions[interaction.user.id];
     const text = sessionToText(session);
     const body = text+githubBodyFooter
@@ -50,6 +66,8 @@ export class ReportSend {
 
     delete shared.reportSessions[interaction.user.id];
 
+    await statusMessage(interaction, "Создание репорта в Discord...");
+
     const reportTitle = `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`;
     
     const embed = new EmbedBuilder()
@@ -73,21 +91,33 @@ export class ReportSend {
       embeds: [ embed ], components: [ githubRow ]
     });
 
+    await statusMessage(interaction, "Открытие обсуждения...");
+
     const thread = await msg.startThread({
       name: reportTitle.slice(0, 100),
       reason: `Открытие GitHub Issue ${process.env["REPORT_REPO"]}#${issue.data.number}`
     })
+
+    await statusMessage(interaction, "Указание обсуждения на GitHub...");
 
     try {
       await shared.octokit?.issues.createComment({
         owner, repo, issue_number: issue.data.number,
         body: `### [Обсуждение в Discord](${thread.url})`
       })
-    } catch (e) {
-      console.error("UNCATCHED! ERROR", e);
-    }
+    } catch (e) { console.error("UNCATCHED! ERROR", e); }
 
-    return await replyToInteraction(interaction, {
+    await statusMessage(interaction, "Уведомление об изображениях...");
+
+    try {
+      await thread.send(
+        `<@!${interaction.user.id}>, сюда можно отправить `+
+        "скриншоты или иные изображения, которые будут "+
+        "полезны для понимания проблемы."
+      );
+    } catch (e) { console.error("UNCATCHED! ERROR", e); }
+
+    return await editOrReply(interaction, {
       content:
         "**Репорт отправлен!**\n"+
         `- Ссылка на GitHub: ${issue.data.html_url}\n`+

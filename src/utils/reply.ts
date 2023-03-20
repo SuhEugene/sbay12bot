@@ -26,3 +26,19 @@ export async function replyToInteraction(
 
   throw Error("Invalid interaction type!");
 }
+
+/**
+ * Abstraction level to reply to either a slash command or a simple command message.
+ * @param interaction 
+ * @param message 
+ */
+export async function editOrReply(
+  interaction: CommandInteraction | ModalSubmitInteraction | ButtonInteraction,
+  message: string | (InteractionReplyOptions)
+): Promise<Message<boolean> | InteractionResponse<boolean>> {
+  
+  if (interaction.replied)
+    return await interaction.editReply(message);
+
+  return await interaction.reply(message);
+}
