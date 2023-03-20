@@ -62,6 +62,8 @@ bot.once("ready", async () => {
   if (!allowedRoles.length)
     throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) is empty!`)
 
+  const mstone = process.env["REPORT_MILESTONE"];
+
   console.log(
     "=============\n"+
     " Bot started\n"+
@@ -70,7 +72,7 @@ bot.once("ready", async () => {
   console.log(` Logged in as:   ${bot.user.tag} [${bot.user.id}]`);
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
   console.log(` Report channel: #${channel.name} [${channel.id}]`);
-  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}`);
+  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}${mstone && (', Milestone: '+ mstone)}`);
 
   console.log(` Allowed roles:`);
   for (const roleId of allowedRoles) {
