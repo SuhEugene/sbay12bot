@@ -28,8 +28,8 @@ export class ReportSend {
   @Guard(
     HasSession,
     RateLimit(TIME_UNIT.minutes, 8, {
-      message: "Отправка репортов разрешена только 2 раза в 8 минут!",
-      rateValue: 2,
+      message: "Отправка репортов разрешена только 4 раза в 8 минут!",
+      rateValue: 4,
       ephemeral: true
     })
   )
