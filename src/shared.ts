@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 
 export enum ReportType {
-  Bug, Mechanics, Object, Sprite
+  Bug, Mechanics, Object, Sprite, Request, Map
 }
 export enum ReportFieldId {
   Ckey = "r-ckey",
@@ -85,33 +85,43 @@ export enum ModalId {
   ReportObject = "modal-report-object",
   ReportBug = "modal-report-bug",
   ReportMech = "modal-report-mech",
-  ReportSprite = "modal-report-sprite"
+  ReportSprite = "modal-report-sprite",
+  ReportRequest = "modal-report-request",
+  ReportMap = "modal-report-map"
 }
 
 export const reportTypeToModalId = {
   [ReportType.Bug]:       ModalId.ReportBug,
   [ReportType.Object]:    ModalId.ReportObject,
   [ReportType.Sprite]:    ModalId.ReportSprite,
-  [ReportType.Mechanics]: ModalId.ReportMech
+  [ReportType.Mechanics]: ModalId.ReportMech,
+  [ReportType.Request]:   ModalId.ReportRequest,
+  [ReportType.Map]:       ModalId.ReportMap
 }
 
 export const reportTitlePrefixes = {
   [ReportType.Bug]: "Баг",
   [ReportType.Mechanics]: "Механ",
   [ReportType.Object]: "Объект",
-  [ReportType.Sprite]: "Старый спрайт"
+  [ReportType.Sprite]: "Старый спрайт",
+  [ReportType.Request]: "Запрос",
+  [ReportType.Map]: "Карта"
 }
 
 export const reportTitleSuffixes = {
   [ReportType.Bug]: "Баг-репорт",
   [ReportType.Mechanics]: "Механ-репорт",
   [ReportType.Object]: "Объект-репорт",
-  [ReportType.Sprite]: "Спрайт-репорт"
+  [ReportType.Sprite]: "Спрайт-репорт",
+  [ReportType.Request]: "Запрос",
+  [ReportType.Map]: "Карта-репорт"
 }
 
 export const reportLabels = {
   [ReportType.Bug]: ":bug: Баг",
   [ReportType.Mechanics]: ":infinity: Механ",
   [ReportType.Object]: ":detective: Объект",
-  [ReportType.Sprite]: ":lady_beetle: Старый спрайт"
+  [ReportType.Sprite]: ":lady_beetle: Старый спрайт",
+  [ReportType.Request]: ":hand: Запрос",
+  [ReportType.Map]: ":world_map: Карты"
 }
