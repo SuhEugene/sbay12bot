@@ -6,7 +6,14 @@ import { config } from "dotenv";
 import { Octokit } from "@octokit/rest";
 import { shared } from "./shared.js";
 import { readReports } from "./utils/githubReports.js";
+import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
+import { createServer } from "http";
+
 config();
+
+export const webhooks = new Webhooks({
+  secret: process.env["GITHUB_SECRET"] as string
+})
 
 export const bot = new Client({
   // To use only guild command
@@ -18,7 +25,6 @@ export const bot = new Client({
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
-    // IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.MessageContent,
   ],
 
@@ -125,6 +131,12 @@ async function run() {
 
   // Log in with your bot token
   await bot.login(process.env["BOT_TOKEN"]);
+
+  // Import github hooks
+  await importx(`${dirname(import.meta.url)}/github/**/*.{ts,js}`)
+
+  // Create webhook server
+  await createServer(createNodeMiddleware(webhooks)).listen(process.env["PORT"] || 51528);
 }
 
 run();

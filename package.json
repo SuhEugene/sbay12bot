@@ -18,6 +18,7 @@
     "@discordx/pagination": "^3.4.0",
     "@discordx/utilities": "^5.2.1",
     "@octokit/rest": "^19.0.7",
+    "@octokit/webhooks": "^10.7.0",
     "cross-env": "^7.0.3",
     "discord.js": "^14.7.1",
     "discordx": "^11.7.0",
