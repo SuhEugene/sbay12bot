@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, MessageCreateOptions, TextChannel } from "discord.js";
 import { bot, webhooks } from "../main.js";
 import { EMBED_COLOR_CLOSED, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared.js";
-import { readReports, reportsMap } from "../utils/githubReports";
+import { readReports, reportsMap } from "../utils/githubReports.js";
 
 async function getMessage(issueNumber: number) {
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
