@@ -22,7 +22,7 @@ async function getMessage(issueNumber: number) {
 enum IssueStatus {
   OPEN = "open",
   COMPLETED = "completed",
-  NOT_PLANNED = "not planned"
+  NOT_PLANNED = "not_planned"
 }
 type ByStatus<T> = {[index: string]: T}
 
