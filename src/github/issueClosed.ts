@@ -1,7 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, MessageCreateOptions, TextChannel } from "discord.js";
+import { EmbedBuilder, TextChannel } from "discord.js";
 import { bot, webhooks } from "../main.js";
 import { EMBED_COLOR_CLOSED, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared.js";
 import { readReports, reportsMap } from "../utils/githubReports.js";
+import { EmitterWebhookEvent } from "@octokit/webhooks";
 
 async function getMessage(issueNumber: number) {
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
@@ -43,11 +44,13 @@ const descriptionByStatus: ByStatus<string> = {
   [IssueStatus.OPEN]: "Работа по решению описанных в репорте проблем возобновлена"
 }
 
-webhooks.onAny(({ id, name, payload }) => {
-  console.log(name, "event received");
+webhooks.onAny(async data => {
+  console.log(data.name, "event received");
+  if (data.name == "issues" && ["closed", "reopened"].includes(data.payload.action))
+    return await issueClosed(data as EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">);
 });
 
-webhooks.on(["issues.closed", "issues.reopened"], async data => {
+async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">) {
   const issueNumber = data.payload.issue.number;
   const issueState = data.payload.issue.state;
   const issueReason = data.payload.issue.state_reason;
@@ -74,4 +77,4 @@ webhooks.on(["issues.closed", "issues.reopened"], async data => {
     await msg.thread.send({ embeds: [ threadEmbed ] });
   }
   return true;
-});
+};
