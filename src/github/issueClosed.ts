@@ -92,4 +92,5 @@ webhooks.on(["issues.closed", "issues.reopened"], async data => {
 
     await msg.thread.send(sendData);
   }
+  return true;
 });

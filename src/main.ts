@@ -136,7 +136,7 @@ async function run() {
   await importx(`${dirname(import.meta.url)}/github/**/*.{ts,js}`)
 
   // Create webhook server
-  createServer(createNodeMiddleware(webhooks)).listen(process.env["PORT"] || 51528);
+  createServer(createNodeMiddleware(webhooks, { path: "/" })).listen(process.env["PORT"] || 51528);
 }
 
 run();
