@@ -64,37 +64,14 @@ webhooks.on(["issues.closed", "issues.reopened"], async data => {
     .setFooter({ text: titleByStatus[status] })
     .setTimestamp();
   
-  let ghButton: ButtonBuilder | null = null;
-
-  const buttonsRow = new ActionRowBuilder<MessageActionRowComponentBuilder>(msg.components[0].data);
-  const pr = data.payload.issue.pull_request;
-  if (pr && pr.html_url) {
-    const prId = String(pr.html_url).split("/").pop() || "";
-    ghButton = new ButtonBuilder()
-      .setLabel(`GitHub PR${Number(prId) ? ' #'+prId : ''}`)
-      .setStyle(ButtonStyle.Link)
-      .setURL(pr.html_url);
-    buttonsRow.addComponents(ghButton);
-  }
-  
-  await msg.edit({ embeds: [ newEmbed ], components: [ buttonsRow ] });
+  await msg.edit({ embeds: [ newEmbed ] });
 
   if (msg.thread) {
-    const sendData: MessageCreateOptions = {};
     const threadEmbed = new EmbedBuilder()
       .setTitle(`Новый статус репорта: **${titleByStatus[status]}**`)
       .setDescription(descriptionByStatus[status])
       .setColor(colorByStatus[status]);
-
-    sendData.embeds = [ threadEmbed ];
-    
-    if (ghButton && status != IssueStatus.NOT_PLANNED) {
-      const brow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
-      brow.addComponents(ghButton);
-      sendData.components = [ brow ];
-    }
-
-    await msg.thread.send(sendData);
+    await msg.thread.send({ embeds: [ threadEmbed ] });
   }
   return true;
 });
