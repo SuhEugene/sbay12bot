@@ -45,9 +45,8 @@ const descriptionByStatus: ByStatus<string> = {
 }
 
 webhooks.onAny(async data => {
-  console.log(data.name, "event received");
-  if (data.name == "issues")
-    console.log(data.payload.action, data);
+  if (data.name == "issues" || data.name == "pull_request")
+    console.log(`Catched hook ${data.name}.${data.payload.action} #${data.name == 'issues' ? data.payload.issue.number : data.payload.pull_request.number}`);
 
   if (data.name == "issues" && ["closed", "reopened"].includes(data.payload.action))
     return await issueClosed(data as EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">);
@@ -62,8 +61,10 @@ async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | EmitterW
   if (issueState == "closed")
     status = issueReason == IssueStatus.NOT_PLANNED ? IssueStatus.NOT_PLANNED : IssueStatus.COMPLETED;
   
+  console.log(`Issue #${issueNumber} is ${status} now`);
+
   const msg = await getMessage(issueNumber);
-  if (!msg) return;
+  if (!msg) return console.warn(`WARNING! Message for the issue #${issueNumber} not found`);
 
   const newEmbed = new EmbedBuilder(msg.embeds[0].data)
     .setColor(colorByStatus[status])
