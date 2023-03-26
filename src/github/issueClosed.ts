@@ -46,6 +46,9 @@ const descriptionByStatus: ByStatus<string> = {
 
 webhooks.onAny(async data => {
   console.log(data.name, "event received");
+  if (data.name == "issues")
+    console.log(data.payload.action, data);
+
   if (data.name == "issues" && ["closed", "reopened"].includes(data.payload.action))
     return await issueClosed(data as EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">);
 });
