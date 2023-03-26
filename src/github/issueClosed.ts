@@ -43,6 +43,10 @@ const descriptionByStatus: ByStatus<string> = {
   [IssueStatus.OPEN]: "Работа по решению описанных в репорте проблем возобновлена"
 }
 
+webhooks.onAny(({ id, name, payload }) => {
+  console.log(name, "event received");
+});
+
 webhooks.on(["issues.closed", "issues.reopened"], async data => {
   const issueNumber = data.payload.issue.number;
   const issueState = data.payload.issue.state;
