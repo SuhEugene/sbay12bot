@@ -21,7 +21,6 @@ const colorByAction: {[index: string]: number} = {
 export async function issueAssigned(data: EmitterWebhookEvent<"issues.assigned"> | EmitterWebhookEvent<"issues.unassigned">) {
   const issueNumber = data.payload.issue.number;
   const issueAssignee = data.payload.assignee;
-  const issueSender = data.payload.sender;
   const issueAction = data.payload.action;
 
   if (!issueAssignee) return;
@@ -31,13 +30,11 @@ export async function issueAssigned(data: EmitterWebhookEvent<"issues.assigned">
 
   if (msg.thread) {
     const assigneeUsername = issueAssignee.name || issueAssignee.login;
-    const senderUsername = issueSender.name || issueSender.login;
     const threadEmbed = new EmbedBuilder()
       .setTitle(titleByAction[issueAction])
       .setDescription(descriptionByAction[issueAction](assigneeUsername))
       .setColor(colorByAction[issueAction])
-      .setThumbnail(issueAssignee.avatar_url)
-      .setFooter({ text: senderUsername, iconURL: issueSender.avatar_url });
+      .setFooter({ text: assigneeUsername, iconURL: issueAssignee.avatar_url });
     await msg.thread.send({ embeds: [ threadEmbed ] });
   }
   return true;
