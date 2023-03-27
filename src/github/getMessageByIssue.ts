@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js";
-import { bot } from "../main";
-import { readReports, reportsMap } from "../utils/githubReports";
+import { bot } from "../main.js";
+import { readReports, reportsMap } from "../utils/githubReports.js";
 
 export async function getMessage(issueNumber: number) {
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
