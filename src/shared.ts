@@ -82,6 +82,9 @@ export const EMBED_COLOR_OPEN = 0x305183;
 export const EMBED_COLOR_CLOSED = 0x8957e5;
 export const EMBED_COLOR_DISMISSED = 0x808080;
 
+export const EMBED_COLOR_SUCCESS = 0x238636;
+export const EMBED_COLOR_DANGER = 0xda3633;
+
 export enum ModalId {
   ReportObject = "modal-report-object",
   ReportBug = "modal-report-bug",

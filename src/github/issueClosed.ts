@@ -1,23 +1,7 @@
-import { EmbedBuilder, TextChannel } from "discord.js";
-import { bot, webhooks } from "../main.js";
+import { EmbedBuilder } from "discord.js";
 import { EMBED_COLOR_CLOSED, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared.js";
-import { readReports, reportsMap } from "../utils/githubReports.js";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-
-async function getMessage(issueNumber: number) {
-  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
-  const channel: TextChannel = await guild.channels.fetch(process.env["REPORT_CHANNEL"] as string) as TextChannel;
-  if (!channel) throw Error("Channel does not exist!");
-
-  await readReports();
-  const messageId = reportsMap.get(issueNumber);
-  if (!messageId) return;
-
-  const msg = await channel.messages.fetch(messageId);
-  if (!msg) throw Error(`Message ${messageId} does not exist!`);
-
-  return msg;
-}
+import { getMessage } from "./getMessageByIssue.js";
 
 enum IssueStatus {
   OPEN = "open",
@@ -44,15 +28,7 @@ const descriptionByStatus: ByStatus<string> = {
   [IssueStatus.OPEN]: "Работа по решению описанных в репорте проблем возобновлена"
 }
 
-webhooks.onAny(async data => {
-  if (data.name == "issues" || data.name == "pull_request")
-    console.log(`Catched hook ${data.name}.${data.payload.action} #${data.name == 'issues' ? data.payload.issue.number : data.payload.pull_request.number}`);
-
-  if (data.name == "issues" && ["closed", "reopened"].includes(data.payload.action))
-    return await issueClosed(data as EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">);
-});
-
-async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">) {
+export async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | EmitterWebhookEvent<"issues.reopened">) {
   const issueNumber = data.payload.issue.number;
   const issueState = data.payload.issue.state;
   const issueReason = data.payload.issue.state_reason;
@@ -64,7 +40,7 @@ async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | EmitterW
   console.log(`Issue #${issueNumber} is ${status} now`);
 
   const msg = await getMessage(issueNumber);
-  if (!msg) return console.warn(`WARNING! Message for the issue #${issueNumber} not found`);
+  if (!msg) return console.warn(`WARNING! ${data.name}.${data.payload.action} Message for the issue #${issueNumber} not found!`);
 
   const newEmbed = new EmbedBuilder(msg.embeds[0].data)
     .setColor(colorByStatus[status])
