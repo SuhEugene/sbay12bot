@@ -3,9 +3,9 @@ import { EmitterWebhookEvent } from "@octokit/webhooks";
 import { getMessage } from "./getMessageByIssue.js";
 import { EMBED_COLOR_DANGER, EMBED_COLOR_SUCCESS } from "../shared.js";
 
-const titleByAction: {[index: string]: (name: string) => string} = {
-  "assigned": (name) => `${name} взял репорт!`,
-  "unassigned": (name) => `${name} скинул репорт!`
+const titleByAction: {[index: string]: string} = {
+  "assigned": 'Репорт взят!',
+  "unassigned": 'Репорт скинут!'
 }
 
 const descriptionByAction: {[index: string]: (name: string) => string} = {
@@ -33,7 +33,7 @@ export async function issueAssigned(data: EmitterWebhookEvent<"issues.assigned">
     const assigneeUsername = issueAssignee.name || issueAssignee.login;
     const senderUsername = issueSender.name || issueSender.login;
     const threadEmbed = new EmbedBuilder()
-      .setTitle(titleByAction[issueAction](assigneeUsername))
+      .setTitle(titleByAction[issueAction])
       .setDescription(descriptionByAction[issueAction](assigneeUsername))
       .setColor(colorByAction[issueAction])
       .setThumbnail(issueAssignee.avatar_url)
