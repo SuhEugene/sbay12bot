@@ -133,7 +133,7 @@ async function run() {
   await bot.login(process.env["BOT_TOKEN"]);
 
   // Import github hooks
-  await import(`${dirname(import.meta.url)}/github/catcher.ts`)
+  await import(`${dirname(import.meta.url)}/github/catcher.js`)
 
   // Create webhook server
   createServer(createNodeMiddleware(webhooks, { path: "/" })).listen(process.env["PORT"] || 51528);
