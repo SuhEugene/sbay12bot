@@ -2,6 +2,7 @@ import { EmitterWebhookEvent } from "@octokit/webhooks";
 import { webhooks } from "../main.js";
 import { issueAssigned } from "./issueAssigned.js";
 import { issueClosed } from "./issueClosed.js";
+import { issueComment } from "./issueComment.js";
 
 webhooks.onAny(async data => {
   if (data.name == "issues" || data.name == "pull_request")
@@ -15,4 +16,8 @@ webhooks.onAny(async data => {
       return await issueAssigned(data as EmitterWebhookEvent<"issues.assigned"> | EmitterWebhookEvent<"issues.unassigned">);
   }
   
+  if (data.name == "issue_comment") {
+    if (data.payload.action == "created")
+      return await issueComment(data as EmitterWebhookEvent<"issue_comment.created">);
+  }
 });
