@@ -32,6 +32,7 @@ export async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | E
   const issueNumber = data.payload.issue.number;
   const issueState = data.payload.issue.state;
   const issueReason = data.payload.issue.state_reason;
+  const issueSender = data.payload.sender;
 
   let status: string = issueState;
   if (issueState == "closed")
@@ -50,11 +51,13 @@ export async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | E
   await msg.edit({ embeds: [ newEmbed ] });
 
   if (msg.thread) {
+    const senderName = issueSender.name || issueSender.login;
     const threadEmbed = new EmbedBuilder()
       .setTitle(`Новый статус репорта: **${titleByStatus[status]}**`)
       .setDescription(descriptionByStatus[status])
-      .setColor(colorByStatus[status]);
-    await msg.thread.send({ embeds: [ threadEmbed ] });
+      .setColor(colorByStatus[status])
+      .setFooter({ text: senderName, iconURL: issueSender.avatar_url });
+      await msg.thread.send({ embeds: [ threadEmbed ] });
   }
   return true;
 };
