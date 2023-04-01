@@ -16,13 +16,14 @@ export async function checkRepo() {
 
   const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
   const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
-
   
   let sinceDate = new Date(1680383635141);
   try {
     const got = await fs.readFile(filePath, "utf-8");
     if (got) sinceDate = new Date(got);
   } catch (e) {}
+
+  console.log("Checking repo "+process.env["GET_REPO"]+". Since: ", sinceDate);
 
   const { data: mergedPullRequests } = await octo.rest.pulls.list({
     owner, repo,

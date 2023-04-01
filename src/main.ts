@@ -97,6 +97,7 @@ bot.once("ready", async () => {
   console.log("=============");
 
   setInterval(checkRepo, 30*MINUTES);
+  checkRepo();
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {
