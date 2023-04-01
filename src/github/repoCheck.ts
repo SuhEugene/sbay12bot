@@ -13,7 +13,7 @@ export async function checkRepo() {
       throw Error("Could not find GET_REPO in your environment")
   if (!process.env["REPORT_REPO"])
       throw Error("Could not find REPORT_REPO in your environment")
-      
+
   const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
   const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
 
@@ -38,7 +38,7 @@ export async function checkRepo() {
       try {
         await octo.rest.pulls.create({
           owner, repo,
-          title: pullRequest.title,
+          title: "[MIRROR] "+pullRequest.title,
           head: pullRequest.head.ref,
           base: "dev220",
           body:
