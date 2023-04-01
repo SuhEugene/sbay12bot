@@ -4,10 +4,11 @@ import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
 import { config } from "dotenv";
 import { Octokit } from "@octokit/rest";
-import { shared } from "./shared.js";
+import { MINUTES, shared } from "./shared.js";
 import { readReports } from "./utils/githubReports.js";
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 import { createServer } from "http";
+import { checkRepo } from "./github/repoCheck.js";
 
 config();
 
@@ -83,6 +84,7 @@ bot.once("ready", async () => {
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
   console.log(` Report channel: #${channel.name} [${channel.id}]`);
   console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}${mstone && (', Milestone: '+ mstone)}`);
+  console.log(` Fetch GitHub:   ${process.env["GET_REPO"]}`);
 
   console.log(` Allowed roles:`);
   for (const roleId of allowedRoles) {
@@ -93,6 +95,8 @@ bot.once("ready", async () => {
   }
 
   console.log("=============");
+
+  setInterval(checkRepo, 30*MINUTES);
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {
@@ -121,6 +125,9 @@ async function run() {
     
   if (!process.env["REPORT_REPO"])
     throw Error("Could not find REPORT_REPO in your environment")
+  
+  if (!process.env["GET_REPO"])
+    throw Error("Could not find GET_REPO in your environment")
 
   if (!process.env["ALLOWED_ROLES"])
     throw Error("Could not find ALLOWED_ROLES in your environment")
