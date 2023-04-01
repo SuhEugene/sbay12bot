@@ -26,7 +26,7 @@ export async function checkRepo() {
   console.log("Checking repo "+process.env["GET_REPO"]+". Since: ", sinceDate);
 
   const { data: mergedPullRequests } = await octo.rest.pulls.list({
-    owner, repo,
+    owner: getOwner, repo: getRepo,
     state: "closed",
     sort: "updated",
     direction: "desc",
@@ -40,7 +40,7 @@ export async function checkRepo() {
         await octo.rest.pulls.create({
           owner, repo,
           title: "[MIRROR] "+pullRequest.title,
-          head: pullRequest.head.ref,
+          head: `${pullRequest.head.repo?.owner?.login}:${pullRequest.head.ref}`,
           base: "dev220",
           body:
             (pullRequest.body || "Описание отсутствует") +
