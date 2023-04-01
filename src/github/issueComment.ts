@@ -3,36 +3,12 @@ import { EMBED_COLOR_CLOSED, EMBED_COLOR_DEFAULT, EMBED_COLOR_DISMISSED, EMBED_C
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 import { getMessage } from "./getMessageByIssue.js";
 
-enum IssueStatus {
-  OPEN = "open",
-  COMPLETED = "completed",
-  NOT_PLANNED = "not_planned"
-}
-type ByStatus<T> = {[index: string]: T}
-
-const colorByStatus: ByStatus<number> = {
-  [IssueStatus.NOT_PLANNED]: EMBED_COLOR_DISMISSED,
-  [IssueStatus.COMPLETED]: EMBED_COLOR_CLOSED,
-  [IssueStatus.OPEN]: EMBED_COLOR_OPEN
-}
-
-const titleByStatus: ByStatus<string> = {
-  [IssueStatus.NOT_PLANNED]: "Отклонён",
-  [IssueStatus.COMPLETED]: "Завершён",
-  [IssueStatus.OPEN]: "Переоткрыт"
-}
-
-const descriptionByStatus: ByStatus<string> = {
-  [IssueStatus.NOT_PLANNED]: "Работа по решению описанных в репорте проблем производиться не будет",
-  [IssueStatus.COMPLETED]: "Проблемы, описанные в репорте, решены",
-  [IssueStatus.OPEN]: "Работа по решению описанных в репорте проблем возобновлена"
-}
-
 export async function issueComment(data: EmitterWebhookEvent<"issue_comment.created">) {
   const issueNumber = data.payload.issue.number;
   const commentURL = data.payload.comment.url;
   const commentText = data.payload.comment.body;
   const commentSender = data.payload.comment.user;
+  if (commentSender.id == 125094432) return;
 
   const msg = await getMessage(issueNumber);
   if (!msg) return console.warn(`WARNING! ${data.name}.${data.payload.action} Message for the issue #${issueNumber} not found!`);
