@@ -92,8 +92,8 @@ export async function checkRepo() {
       await fs.unlink(patchFileName);
   } catch (e: any) {
       await git.reset(ResetMode.HARD);
-      const fails = (e as string).split("error: patch failed").length-1;
-      const successes = (e as string).split("Applied patch to").length-1;
+      const fails = (e.message as string).split("error: patch failed").length-1;
+      const successes = (e.message as string).split("Applied patch to").length-1;
       if (fails !== successes || !fails || !successes) {
         console.error("Patch couldn't be applied!\n\n", e);
         console.error(`(Fails: ${fails}) != (Successes: ${successes})`)
