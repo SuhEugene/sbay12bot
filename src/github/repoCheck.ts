@@ -73,6 +73,7 @@ export async function checkRepo() {
 
   for (const pr of prs) {
     const branchName = `bay12-pr-${pr.number}`;
+    const patchFileName = path.join(repoPath, branchName+".patch");
     await git.fetch("origin");
     await git.checkout("dev220");
     await git.pull("origin", "dev220");
@@ -84,12 +85,14 @@ export async function checkRepo() {
     }
 
     const patch = await octo.request(pr.patch_url);
+    await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
       await git.applyPatch(patch.data, ["--3way"], console.log);
-    } catch (e) {
+      await fs.unlink(patchFileName);
+  } catch (e) {
       await git.reset(ResetMode.HARD);
-      console.error("Patch couldn't be applied!");
+      console.error("Patch couldn't be applied!\n\n", e);
       return;
     }
 
