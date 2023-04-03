@@ -48,7 +48,7 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
 }
 
 function log(...args: any[]) {
-  return console.log(...args.map(arg => `GIT> ${arg}`))
+  return console.log("=== GIT ===", ...args, "--- GIT ---")
 }
 
 
@@ -96,7 +96,7 @@ export async function checkRepo() {
       await fs.unlink(patchFileName);
   } catch (e: any) {
       await git.reset(ResetMode.HARD, log);
-      
+
       const fails = (e.message as string).split("error: patch failed").length-1;
       const successes = (e.message as string).split("Applied patch to").length-1;
       if (fails !== successes || !fails || !successes) {
