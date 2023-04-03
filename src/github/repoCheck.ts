@@ -88,7 +88,7 @@ export async function checkRepo() {
     await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
-      await git.applyPatch(patch.data, ["--3way"], console.log);
+      await git.applyPatch(patchFileName, ["--3way"], console.log);
       await fs.unlink(patchFileName);
   } catch (e) {
       await git.reset(ResetMode.HARD);
