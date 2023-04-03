@@ -63,9 +63,13 @@ export async function checkRepo() {
   if (!octo) return;
 
   if (!process.env["GET_REPO"])
-      throw Error("Could not find GET_REPO in your environment")
+    throw Error("Could not find GET_REPO in your environment")
   if (!process.env["REPORT_REPO"])
-      throw Error("Could not find REPORT_REPO in your environment")
+    throw Error("Could not find REPORT_REPO in your environment")
+  if (!process.env["GIT_EMAIL"])
+    throw Error("Could not find GIT_EMAIL in your environment")
+  if (!process.env["GIT_NAME"])
+    throw Error("Could not find GIT_NAME in your environment")
 
   const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
   const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
@@ -78,6 +82,8 @@ export async function checkRepo() {
   if (!repoExists) {
     await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath);
   }
+  await git.addConfig("user.email", process.env["GIT_EMAIL"]);
+  await git.addConfig("user.name",  process.env["GIT_NAME"]);
 
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
 
@@ -115,7 +121,12 @@ export async function checkRepo() {
 
     await git.add(".", log);
     await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`, log);
-    await git.push("origin", branchName, ["-f"], log);
+    try {
+      await git.push("origin", branchName, undefined, log);
+    } catch (e) {
+      console.error("CANNOT PUSH, FORCING!!!", e);
+      await git.push("origin", branchName, ["-f"], log);
+    }
     try {
       await octo.pulls.create({
         owner, repo,
