@@ -81,13 +81,13 @@ export async function checkRepo() {
     const patch = await octo.request(pr.patch_url);
 
     try {
-      await git.applyPatch(patch.data);
+      await git.applyPatch(patch.data, ["-3"]);
     } catch (e) {
       await git.reset(ResetMode.HARD);
     }
 
     await git.add(".");
-    await git.raw("commit", "--allow-conflicts", "-m", `Apply patch for PR #${pr.number}`);
+    await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`);
     await git.push("origin", branchName);
 
     await octo.pulls.create({
