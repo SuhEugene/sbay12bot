@@ -77,6 +77,7 @@ export async function checkRepo() {
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
 
   for (const pr of prs) {
+    console.log("\n\n>>> PR NUMBER "+ pr.number)
     const branchName = `bay12-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
     await git.fetch("origin", undefined, log);
