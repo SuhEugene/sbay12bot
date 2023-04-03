@@ -79,7 +79,8 @@ export async function checkRepo() {
     try {
       await git.checkoutBranch(branchName, "dev220");
     } catch (e) {
-      await git.checkout(branchName);
+      await git.deleteLocalBranch(branchName, true);
+      await git.checkoutBranch(branchName, "dev220");
     }
 
     const patch = await octo.request(pr.patch_url);
@@ -88,6 +89,8 @@ export async function checkRepo() {
       await git.applyPatch(patch.data, ["-3"]);
     } catch (e) {
       await git.reset(ResetMode.HARD);
+      console.error("Patch couldn't be applied!");
+      return;
     }
 
     await git.add(".");
