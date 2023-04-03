@@ -48,7 +48,7 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
 }
 
 function log(...args: any[]) {
-  return console.log("=== GIT ===", ...args, "--- GIT ---")
+  return console.log("=== GIT ===\n", ...args, "\n--- GIT ---")
 }
 
 
@@ -93,22 +93,22 @@ export async function checkRepo() {
 
     try {
       await git.applyPatch(patchFileName, ["--3way"], log);
-      await fs.unlink(patchFileName);
   } catch (e: any) {
-      await git.reset(ResetMode.HARD, log);
 
       const fails = (e.message as string).split("error: patch failed").length-1;
       const successes = (e.message as string).split("Applied patch to").length-1;
       if (fails !== successes || !fails || !successes) {
+        await git.reset(ResetMode.HARD, log);
         console.error("Patch couldn't be applied!\n\n", e);
         console.error(`(Fails: ${fails}) != (Successes: ${successes})`)
         return;
       }
     }
+    await fs.unlink(patchFileName);
 
     await git.add(".", log);
     await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`, log);
-    await git.push("origin", branchName, undefined, log);
+    await git.push("origin", branchName, ["-f"], log);
 
     await octo.pulls.create({
       owner, repo,
