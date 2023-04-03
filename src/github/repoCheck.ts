@@ -120,7 +120,7 @@ export async function checkRepo() {
     await fs.unlink(patchFileName);
 
     await git.add(".", log);
-    await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`, log);
+    await git.raw("commit", "-m", `Apply patch for PR bay12-${pr.number}`, log);
     try {
       await git.push("origin", branchName, undefined, log);
     } catch (e) {
