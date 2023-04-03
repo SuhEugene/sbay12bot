@@ -94,10 +94,11 @@ export async function checkRepo() {
       await git.reset(ResetMode.HARD);
       const fails = (e as string).split("error: patch failed").length-1;
       const successes = (e as string).split("Applied patch to").length-1;
-      if (fails !== successes || !fails || !successes)
+      if (fails !== successes || !fails || !successes) {
         console.error("Patch couldn't be applied!\n\n", e);
         console.error(`(Fails: ${fails}) != (Successes: ${successes})`)
         return;
+      }
     }
 
     await git.add(".");
