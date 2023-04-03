@@ -86,7 +86,7 @@ export async function checkRepo() {
     const patch = await octo.request(pr.patch_url);
 
     try {
-      await git.applyPatch(patch.data, ["-3"]);
+      await git.applyPatch(patch.data, ["--3way"], console.log);
     } catch (e) {
       await git.reset(ResetMode.HARD);
       console.error("Patch couldn't be applied!");
