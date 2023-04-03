@@ -47,6 +47,10 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
   return PRs.reverse();
 }
 
+function log(...args: any[]) {
+  return console.log(...args.map(arg => `GIT> ${arg}`))
+}
+
 
 export async function checkRepo() {
   const octo = shared.octokit;
@@ -74,24 +78,25 @@ export async function checkRepo() {
   for (const pr of prs) {
     const branchName = `bay12-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
-    await git.fetch("origin");
-    await git.checkout("dev220");
-    await git.pull("origin", "dev220");
+    await git.fetch("origin", undefined, log);
+    await git.checkout("dev220", undefined, log);
+    await git.pull("origin", "dev220", undefined, log);
     try {
-      await git.checkoutBranch(branchName, "dev220");
+      await git.checkoutBranch(branchName, "dev220", log);
     } catch (e) {
-      await git.deleteLocalBranch(branchName, true);
-      await git.checkoutBranch(branchName, "dev220");
+      await git.deleteLocalBranch(branchName, true, log);
+      await git.checkoutBranch(branchName, "dev220", log);
     }
 
     const patch = await octo.request(pr.patch_url);
     await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
-      await git.applyPatch(patchFileName, ["--3way"]);
+      await git.applyPatch(patchFileName, ["--3way"], log);
       await fs.unlink(patchFileName);
   } catch (e: any) {
-      await git.reset(ResetMode.HARD);
+      await git.reset(ResetMode.HARD, log);
+      
       const fails = (e.message as string).split("error: patch failed").length-1;
       const successes = (e.message as string).split("Applied patch to").length-1;
       if (fails !== successes || !fails || !successes) {
@@ -101,9 +106,9 @@ export async function checkRepo() {
       }
     }
 
-    await git.add(".");
-    await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`);
-    await git.push("origin", branchName);
+    await git.add(".", log);
+    await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`, log);
+    await git.push("origin", branchName, undefined, log);
 
     await octo.pulls.create({
       owner, repo,
