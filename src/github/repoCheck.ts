@@ -4,6 +4,7 @@ import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { ResetMode } from "simple-git";
+import { RequestError } from "@octokit/request-error";
 
 const filePath = path.join(cwd(), "src", "data", "lastFetch.txt");
 const repoPath = path.join(cwd(), "repo");
@@ -109,16 +110,21 @@ export async function checkRepo() {
     await git.add(".", log);
     await git.raw("commit", "-m", `Apply patch for PR #${pr.number}`, log);
     await git.push("origin", branchName, ["-f"], log);
-
-    await octo.pulls.create({
-      owner, repo,
-      head: branchName,
-      base: "dev220",
-      title: `[MIRROR] ${pr.title}`,
-      body:
-        `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
-        pr.body
-    });
+    try {
+      await octo.pulls.create({
+        owner, repo,
+        head: branchName,
+        base: "dev220",
+        title: `[MIRROR] ${pr.title}`,
+        body:
+          `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
+          pr.body
+      });
+    } catch (e: any) {
+      const re = e as RequestError;
+      if (!re.message.includes("pull request already exists"))
+        throw e;
+    }
   }
 
   await writeSinceDate(currentTime);
