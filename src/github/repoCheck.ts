@@ -76,7 +76,11 @@ export async function checkRepo() {
     await git.fetch("origin");
     await git.checkout("dev220");
     await git.pull("origin", "dev220");
-    await git.checkoutBranch(branchName, "dev220");
+    try {
+      await git.checkoutBranch(branchName, "dev220");
+    } catch (e) {
+      await git.checkout(branchName);
+    }
 
     const patch = await octo.request(pr.patch_url);
 
