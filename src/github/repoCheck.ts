@@ -38,11 +38,11 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
   let end = false;
   for await (const page of prPaginator) {
     for (const pr of page.data) {
-      if (new Date(pr.updated_at) < sinceDate)  { end = true; break; }
+      if (new Date(pr.updated_at) <= sinceDate)  { end = true; break; }
 
       if (!pr.merged_at)
         continue;
-      if (new Date(pr.merged_at) < sinceDate)
+      if (new Date(pr.merged_at) <= sinceDate)
         continue;
         
       PRs.push(pr);
@@ -131,8 +131,6 @@ export async function checkRepo() {
       if (!re.message.includes("pull request already exists"))
         throw e;
     }
+    await writeSinceDate(new Date(pr.updated_at));
   }
-
-  await writeSinceDate(currentTime);
-  
 }
