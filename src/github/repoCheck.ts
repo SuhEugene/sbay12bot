@@ -88,12 +88,16 @@ export async function checkRepo() {
     await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
-      await git.applyPatch(patchFileName, ["--3way"], console.log);
+      await git.applyPatch(patchFileName, ["--3way"]);
       await fs.unlink(patchFileName);
-  } catch (e) {
+  } catch (e: any) {
       await git.reset(ResetMode.HARD);
-      console.error("Patch couldn't be applied!\n\n", e);
-      return;
+      const fails = (e as string).split("error: patch failed").length-1;
+      const successes = (e as string).split("Applied patch to").length-1;
+      if (fails !== successes || !fails || !successes)
+        console.error("Patch couldn't be applied!\n\n", e);
+        console.error(`(Fails: ${fails}) != (Successes: ${successes})`)
+        return;
     }
 
     await git.add(".");
