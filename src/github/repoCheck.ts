@@ -74,13 +74,13 @@ export async function checkRepo() {
   const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
   const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
   
-  const currentTime = new Date();
   const sinceDate = await getSinceDate();
-  console.log("Checking repo "+process.env["GET_REPO"]+". Since: ", sinceDate);
+  console.log("Checking repo "+process.env["GET_REPO"]+". Since:", sinceDate, "at", new Date());
 
   const repoExists = await git.checkIsRepo();
   if (!repoExists) {
     await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath);
+    await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`);
   }
   await git.addConfig("user.email", process.env["GIT_EMAIL"]);
   await git.addConfig("user.name",  process.env["GIT_NAME"]);
@@ -89,9 +89,10 @@ export async function checkRepo() {
 
   for (const pr of prs) {
     console.log("\n\n>>> PR NUMBER "+ pr.number)
-    const branchName = `bay12-pr-${pr.number}`;
+    const branchName = `upstream-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
     await git.fetch("origin", undefined, log);
+    await git.fetch("upstream", undefined, log);
     await git.checkout("dev220", undefined, log);
     await git.pull("origin", "dev220", undefined, log);
     try {
@@ -113,14 +114,14 @@ export async function checkRepo() {
       if (fails !== successes || !fails || !successes) {
         await git.reset(ResetMode.HARD, log);
         console.error("Patch couldn't be applied!\n\n", e);
-        console.error(`(Fails: ${fails}) != (Successes: ${successes})`)
+        console.error(`(Fails: ${fails}) != (Successes: ${successes})`);
         return;
       }
     }
     await fs.unlink(patchFileName);
 
     await git.add(".", log);
-    await git.raw("commit", "-m", `Apply patch for PR bay12-${pr.number}`, log);
+    await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, /*"--author", `${pr.user}`,*/ log);
     try {
       await git.push("origin", branchName, undefined, log);
     } catch (e) {
