@@ -75,7 +75,9 @@ export async function checkRepo() {
   const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
   
   const sinceDate = await getSinceDate();
-  console.log("Checking repo "+process.env["GET_REPO"]+". Since:", sinceDate, "at", new Date());
+  console.log("Checking repo "+process.env["GET_REPO"]);
+  console.log("Since:", sinceDate);
+  console.log("At:", new Date());
 
   const repoExists = await git.checkIsRepo();
   if (!repoExists) {
@@ -91,15 +93,15 @@ export async function checkRepo() {
     console.log("\n\n>>> PR NUMBER "+ pr.number)
     const branchName = `upstream-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
-    await git.fetch("origin", undefined, log);
-    await git.fetch("upstream", undefined, log);
-    await git.checkout("dev220", undefined, log);
-    await git.pull("origin", "dev220", undefined, log);
+    await git.fetch("origin");
+    await git.fetch("upstream");
+    await git.checkout("dev220");
+    await git.pull("origin", "dev220");
     try {
-      await git.checkoutBranch(branchName, "dev220", log);
+      await git.checkoutBranch(branchName, "dev220");
     } catch (e) {
-      await git.deleteLocalBranch(branchName, true, log);
-      await git.checkoutBranch(branchName, "dev220", log);
+      await git.deleteLocalBranch(branchName, true);
+      await git.checkoutBranch(branchName, "dev220");
     }
 
     const patch = await octo.request(pr.patch_url);
@@ -120,7 +122,7 @@ export async function checkRepo() {
     }
     await fs.unlink(patchFileName);
 
-    await git.add(".", log);
+    await git.add(".");
     await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, /*"--author", `${pr.user}`,*/ log);
     try {
       await git.push("origin", branchName, undefined, log);
