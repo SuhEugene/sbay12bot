@@ -147,4 +147,5 @@ export async function checkRepo() {
     }
     await writeSinceDate(new Date(pr.updated_at));
   }
+  console.log("Check successful!")
 }
