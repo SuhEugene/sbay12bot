@@ -123,7 +123,13 @@ export async function checkRepo() {
     await fs.unlink(patchFileName);
 
     await git.add(".");
-    await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, /*"--author", `${pr.user}`,*/ log);
+    if (pr.user) {
+      const u = pr.user;
+      await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, "--author", `${u.name||u.login} <${u.id}+${u.login}@users.noreply.github.com>`, log);
+    } else {
+      await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, log);
+
+    }
     try {
       await git.push("origin", branchName, undefined, log);
     } catch (e) {
