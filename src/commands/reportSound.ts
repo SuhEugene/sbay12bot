@@ -13,33 +13,33 @@ import { ModalId, ReportFieldId, ReportFieldOptions, ReportType } from "../share
   HasMinionRole
 )
 @SlashGroup("репорт")
-export class ReportRequestCommand extends CommandWithFields {
+export class ReportSoundCommand extends CommandWithFields {
 
-  static commandType: ReportType = ReportType.Request;
+  static commandType: ReportType = ReportType.Sound;
   static fields: { [index: string]: ReportFieldOptions; } = {
     [ReportFieldId.Title]: {
-      label: "Проблема вкратце",
-      placeholder: "Тусклые лампочки",
+      label: "Какой звук и для какого предмета - вкратце",
+      placeholder: "Звук взятия стакана",
       min: 3, max: 100
     },
     [ReportFieldId.Object]: {
       label: "Названия связанных предметов (в игре)",
-      placeholder: "light fixture",
+      placeholder: "half-pint glass",
       min: 3, max: 100
     },
     [ReportFieldId.AdditionalInfo]: {
       label: "Проблема подробно",
-      placeholder: "Лампочки (маленькие) светят настолько тускло, что в кабинках дормиториев не видно совершенно ничего. На инфинити они были ярче.",
+      placeholder: "Звук очень громкий и бьёт по ушам. Его громкость нужно вполовину уменьшить или заменить на какой-то другой.",
       max: 1500, long: true, optional: true
     }
   }
 
-  @Slash({ name: "запрос", description: "В игре что-то ощущается совсем не так, шероховато. Запрос модификации." })
+  @Slash({ name: "звук", description: "Звука нет или звук не подходит, звучит плохо." })
   async onCommand(interaction: CommandInteraction) {
     return super.onCommand(interaction);
   }
 
-  @ModalComponent({ id: ModalId.ReportRequest })
+  @ModalComponent({ id: ModalId.ReportSound })
   async onModal(interaction: ModalSubmitInteraction) {
     return super.onModal(interaction);
   }

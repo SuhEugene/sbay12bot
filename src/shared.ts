@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 
 export enum ReportType {
-  Bug, Mechanics, Object, Sprite, Request, Map
+  Bug, Mechanics, Object, Sprite, Request, Map, Sound
 }
 export enum ReportFieldId {
   Ckey = "r-ckey",
@@ -91,7 +91,8 @@ export enum ModalId {
   ReportMech = "modal-report-mech",
   ReportSprite = "modal-report-sprite",
   ReportRequest = "modal-report-request",
-  ReportMap = "modal-report-map"
+  ReportMap = "modal-report-map",
+  ReportSound = "modal-report-sound"
 }
 
 export const reportTypeToModalId = {
@@ -100,7 +101,8 @@ export const reportTypeToModalId = {
   [ReportType.Sprite]:    ModalId.ReportSprite,
   [ReportType.Mechanics]: ModalId.ReportMech,
   [ReportType.Request]:   ModalId.ReportRequest,
-  [ReportType.Map]:       ModalId.ReportMap
+  [ReportType.Map]:       ModalId.ReportMap,
+  [ReportType.Sound]:     ModalId.ReportSound
 }
 
 export const reportTitlePrefixes = {
@@ -109,7 +111,8 @@ export const reportTitlePrefixes = {
   [ReportType.Object]: "Объект",
   [ReportType.Sprite]: "Старый спрайт",
   [ReportType.Request]: "Запрос",
-  [ReportType.Map]: "Карта"
+  [ReportType.Map]: "Карта",
+  [ReportType.Sound]: "Звук"
 }
 
 export const reportTitleSuffixes = {
@@ -118,7 +121,8 @@ export const reportTitleSuffixes = {
   [ReportType.Object]: "Объект-репорт",
   [ReportType.Sprite]: "Спрайт-репорт",
   [ReportType.Request]: "Запрос",
-  [ReportType.Map]: "Карта-репорт"
+  [ReportType.Map]: "Карта-репорт",
+  [ReportType.Sound]: "Звук-репорт"
 }
 
 export const reportLabels = {
@@ -127,7 +131,8 @@ export const reportLabels = {
   [ReportType.Object]: ":detective: Объект",
   [ReportType.Sprite]: ":lady_beetle: Старый спрайт",
   [ReportType.Request]: ":hand: Запрос",
-  [ReportType.Map]: ":world_map: Карты"
+  [ReportType.Map]: ":world_map: Карты",
+  [ReportType.Sound]: ":sound: Звуки"
 }
 
 export const SECONDS = 1000;
