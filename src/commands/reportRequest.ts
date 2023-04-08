@@ -29,7 +29,7 @@ export class ReportRequestCommand extends CommandWithFields {
     },
     [ReportFieldId.AdditionalInfo]: {
       label: "Проблема подробно",
-      placeholder: "Лампочки (маленькие) светят настолько тускло, что в кабинках дормиториев не видно совершенно ничего. На инфинити они были ярче.",
+      placeholder: "В кабинках дормиториев не видно совершенно ничего. На инфинити лампочки были ярче.",
       max: 1500, long: true, optional: true
     }
   }
