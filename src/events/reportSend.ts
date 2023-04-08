@@ -27,9 +27,9 @@ const statusMessage = async (interaction: ButtonInteraction, text: string) => {
 export class ReportSend {
   @Guard(
     HasSession,
-    RateLimit(TIME_UNIT.minutes, 8, {
-      message: "Отправка репортов разрешена только 4 раза в 8 минут!",
-      rateValue: 4,
+    RateLimit(TIME_UNIT.minutes, 10, {
+      message: "Отправка репортов разрешена только 10 раз в 10 минут!",
+      rateValue: 10,
       ephemeral: true
     })
   )
