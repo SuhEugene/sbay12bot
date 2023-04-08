@@ -29,7 +29,7 @@ export class ReportSoundCommand extends CommandWithFields {
     },
     [ReportFieldId.AdditionalInfo]: {
       label: "Проблема подробно",
-      placeholder: "Звук очень громкий и бьёт по ушам. Его громкость нужно вполовину уменьшить или заменить на какой-то другой.",
+      placeholder: "Звук очень громкий и бьёт по ушам. Его громкость нужно вполовину уменьшить или заменить на другой.",
       max: 1500, long: true, optional: true
     }
   }
