@@ -133,14 +133,14 @@ export async function checkRepo() {
         + (e.message as string).split("error: the patch applies to").length-1;
       const successes = (e.message as string).split("Applied patch to").length-1;
 
-      // let scssc = 0; // additional successes for binaries;
-      // const test = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
-      // for (const el of test) {
-      //   const path = el[1].trim();
-      //   console.log(`[PRMERGE] Checking out theirs binary ${path}...`);
-      //   await git.checkout(path, ["--theirs"]);
-      //   scssc++;
-      // }
+      let scssc = 0; // additional successes for binaries;
+      const test = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
+      for (const el of test) {
+        const path = el[1].trim();
+        console.log(`[PRMERGE] Checking out theirs binary ${path}...`);
+        await git.checkout(path, ["--theirs"]);
+        scssc++;
+      }
 
       if (fails > successes || !fails || !successes) {
         await git.reset(ResetMode.HARD, log);
