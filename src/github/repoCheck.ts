@@ -87,30 +87,47 @@ export async function checkRepo() {
   await git.addConfig("user.email", process.env["GIT_EMAIL"]);
   await git.addConfig("user.name",  process.env["GIT_NAME"]);
 
+  console.log(`[PRMERGE] Getting PRs to merge...`);
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
 
   for (const pr of prs) {
     console.log("\n\n>>> PR NUMBER "+ pr.number)
     const branchName = `upstream-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
+    console.log("[PRMERGE] Fetching origin...");
     await git.fetch("origin");
+
+    console.log("[PRMERGE] Fetching upstream...");
     await git.fetch("upstream");
+
+    console.log("[PRMERGE] Checking out dev220...")
     await git.checkout("dev220");
+    
+    console.log("[PRMERGE] Pulling origin dev220...")
     await git.pull("origin", "dev220");
     try {
+      console.log(`[PRMERGE] Checking out ${branchName} from dev220...`);
       await git.checkoutBranch(branchName, "dev220");
     } catch (e) {
+      console.log(`[PRMERGE] Deleting branch ${branchName}...`);
       await git.deleteLocalBranch(branchName, true);
+
+      console.log(`[PRMERGE] Checking out ${branchName} from dev220 again...`);
       await git.checkoutBranch(branchName, "dev220");
     }
 
+    console.log(`[PRMERGE] Requesting patch for PR #${pr.number}...`);
     const patch = await octo.request(pr.patch_url);
+
+    console.log(`[PRMERGE] Writing patch for PR #${pr.number}...`);
     await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
+      console.log(`[PRMERGE] Applying patch for PR #${pr.number}...`);
       await git.applyPatch(patchFileName, ["--3way"], log);
   } catch (e: any) {
 
+      console.log(`[PRMERGE] Counting fails and successes...`);
       const fails = (e.message as string).split("error: patch failed").length-1;
       const successes = (e.message as string).split("Applied patch to").length-1;
       if (fails !== successes || !fails || !successes) {
@@ -120,23 +137,29 @@ export async function checkRepo() {
         return;
       }
     }
+    console.log(`[PRMERGE] Deleting patch file...`);
     await fs.unlink(patchFileName);
 
+    console.log(`[PRMERGE] Adding everything to commit...`);
     await git.add(".");
     if (pr.user) {
+      console.log(`[PRMERGE] Commiting with author...`);
       const u = pr.user;
       await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, "--author", `${u.name||u.login} <${u.id}+${u.login}@users.noreply.github.com>`, log);
     } else {
+      console.log(`[PRMERGE] Commiting without author...`);
       await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, log);
-
     }
     try {
+      console.log(`[PRMERGE] Pushing to origin/${branchName}...`);
       await git.push("origin", branchName, undefined, log);
     } catch (e) {
+      console.log(`[PRMERGE] Force pushing to origin/${branchName}...`);
       console.error("CANNOT PUSH, FORCING!!!", e);
       await git.push("origin", branchName, ["-f"], log);
     }
     try {
+      console.log(`[PRMERGE] Creating pull request...`);
       await octo.pulls.create({
         owner, repo,
         head: branchName,
@@ -151,6 +174,7 @@ export async function checkRepo() {
       if (!re.message.includes("pull request already exists"))
         throw e;
     }
+    console.log(`[PRMERGE] Writing since date...`);
     await writeSinceDate(new Date(pr.updated_at));
   }
   console.log("Check successful!")
