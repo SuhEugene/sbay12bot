@@ -128,7 +128,9 @@ export async function checkRepo() {
   } catch (e: any) {
 
       console.log(`[PRMERGE] Counting fails and successes...`);
-      const fails = (e.message as string).split("error: patch failed").length-1;
+      const fails = 0
+        + (e.message as string).split("error: patch failed").length-1
+        + (e.message as string).split("error: the patch applies to").length-1;
       const successes = (e.message as string).split("Applied patch to").length-1;
 
       // let scssc = 0; // additional successes for binaries;
