@@ -46,6 +46,6 @@ export class MirrorVote {
     mirrorPRs.data = mirrorsCopy;
     mirrorPRs.write();
 
-    thread.send("https://cdn.discordapp.com/attachments/678945662368350238/1095793983499817090/votestart.ogg");
+    thread.send("https://cdn.discordapp.com/attachments/678945662368350238/1095794550385168474/vote.mp3");
   }
 }
