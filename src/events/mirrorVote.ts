@@ -7,6 +7,10 @@ import { replyToInteraction } from "../utils/reply.js";
 export class MirrorVote {
   @ButtonComponent({ id: ButtonId.MirrorVote })
   async acceptMirror(interaction: ButtonInteraction) {
+    if (interaction.user.id != "706124306660458507") return await replyToInteraction(interaction, {
+      content: "Пока что это тыкать может только Юджин!",
+      ephemeral: true
+    }); 
     const mirrors = await mirrorPRs.read();
     const mirror = mirrors.find(e => e.message == interaction.message.id);
 
@@ -47,5 +51,10 @@ export class MirrorVote {
     mirrorPRs.write();
 
     thread.send("https://cdn.discordapp.com/attachments/678945662368350238/1095794550385168474/vote.mp3");
+
+    return await replyToInteraction(interaction, {
+      content: "Голосование начато!",
+      ephemeral: true
+    });
   }
 }

@@ -7,6 +7,10 @@ import { replyToInteraction } from "../utils/reply.js";
 export class MirrorAccept {
   @ButtonComponent({ id: ButtonId.MirrorAccept })
   async acceptMirror(interaction: ButtonInteraction) {
+    if (interaction.user.id != "706124306660458507") return await replyToInteraction(interaction, {
+      content: "Пока что это тыкать может только Юджин!",
+      ephemeral: true
+    }); 
     const mirrors = await mirrorPRs.read();
     const mirror = mirrors.find(e => e.message == interaction.message.id);
 
@@ -35,5 +39,10 @@ export class MirrorAccept {
 
     mirrorPRs.data = (await mirrorPRs.read()).filter(el => el.message != interaction.message.id);
     await mirrorPRs.write();
+
+    return await replyToInteraction(interaction, {
+      content: "ПР принят!",
+      ephemeral: true
+    });
   }
 }
