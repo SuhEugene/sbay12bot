@@ -1,5 +1,8 @@
 import { Octokit } from "@octokit/rest";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
+import { ArrayIO } from "./utils/arrayIO.js";
+import { cwd } from "process";
+import path from "path";
 
 export enum ReportType {
   Bug, Mechanics, Object, Sprite, Request, Map, Sound
@@ -44,7 +47,9 @@ export type ReportFieldOptions = {
 
 export enum ButtonId {
   ReportSend = "report-send",
-  ReportCancel = "report-cancel"
+  ReportCancel = "report-cancel",
+  MirrorAccept = "mirror-accept",
+  MirrorVote = "mirror-vote"
 }
 
 const sendReportButton = new ButtonBuilder()
@@ -62,6 +67,24 @@ const sendReportButton = new ButtonBuilder()
 export const sendOrAddInfoReportRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
   addAdditionalInfo, sendReportButton
 );
+
+
+const acceptMirrorButton = new ButtonBuilder()
+  .setLabel("Принять")
+  .setEmoji("<:Chad:988503823733620756>")
+  .setStyle(ButtonStyle.Success)
+  .setCustomId(ButtonId.MirrorAccept);
+
+  const voteMirrorButton = new ButtonBuilder()
+  .setLabel("Голосование")
+  .setEmoji("<a:GachiHere:837703420071903243>")
+  .setStyle(ButtonStyle.Secondary)
+  .setCustomId(ButtonId.MirrorVote);
+
+export const acceptOrVoteMirrorRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+  voteMirrorButton, acceptMirrorButton
+);
+
 
 type sharedType = {
   reportSessions: {[index: string]: ReportTypedData};
@@ -83,6 +106,7 @@ export const EMBED_COLOR_CLOSED = 0x8957e5;
 export const EMBED_COLOR_DISMISSED = 0x808080;
 
 export const EMBED_COLOR_SUCCESS = 0x238636;
+export const EMBED_COLOR_WARNING = 0xffaa00;
 export const EMBED_COLOR_DANGER = 0xda3633;
 
 export enum ModalId {
@@ -135,7 +159,25 @@ export const reportLabels = {
   [ReportType.Sound]: ":sound: Звуки"
 }
 
+export enum GithubLabel {
+  Vote, Accepted, Mirror
+}
+
+export const githubLabels = {
+  [GithubLabel.Vote]: ":hourglass: Ожидание голосования",
+  [GithubLabel.Accepted]: ":white_check_mark: Принято",
+  [GithubLabel.Mirror]: ":mirror: MIR ЯОЯ"
+}
+
 export const SECONDS = 1000;
 export const MINUTES = SECONDS*60;
 export const HOURS = MINUTES*60;
 export const DAYS = HOURS*24;
+
+type PrData = {
+  message: string,
+  pr_number: number,
+  started_at?: number
+}
+
+export const mirrorPRs = new ArrayIO<PrData>(path.join(cwd(), "src", "data", "mirrors.json"));

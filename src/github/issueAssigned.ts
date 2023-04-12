@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-import { getMessage } from "./getMessageByIssue.js";
+import { getMessageByIssue } from "./getMessageByIssue.js";
 import { EMBED_COLOR_DANGER, EMBED_COLOR_SUCCESS } from "../shared.js";
 
 const titleByAction: {[index: string]: string} = {
@@ -25,7 +25,7 @@ export async function issueAssigned(data: EmitterWebhookEvent<"issues.assigned">
 
   if (!issueAssignee) return;
 
-  const msg = await getMessage(issueNumber);
+  const msg = await getMessageByIssue(issueNumber);
   if (!msg) return console.warn(`WARNING! ${data.name}.${data.payload.action} Message for the issue #${issueNumber} not found!`);
 
   if (msg.thread) {

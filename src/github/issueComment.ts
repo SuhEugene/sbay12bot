@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import { EMBED_COLOR_CLOSED, EMBED_COLOR_DEFAULT, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared.js";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-import { getMessage } from "./getMessageByIssue.js";
+import { getMessageByIssue } from "./getMessageByIssue.js";
 
 export async function issueComment(data: EmitterWebhookEvent<"issue_comment.created">) {
   const issueNumber = data.payload.issue.number;
@@ -10,7 +10,7 @@ export async function issueComment(data: EmitterWebhookEvent<"issue_comment.crea
   const commentSender = data.payload.comment.user;
   if (commentSender.id == 125094432) return;
 
-  const msg = await getMessage(issueNumber);
+  const msg = await getMessageByIssue(issueNumber);
   if (!msg) return console.warn(`WARNING! ${data.name}.${data.payload.action} Message for the issue #${issueNumber} not found!`);
 
   if (msg.thread) {

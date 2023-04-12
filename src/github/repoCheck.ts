@@ -1,10 +1,12 @@
 import { promises as fs } from "fs";
-import { shared } from "../shared.js";
+import { EMBED_COLOR_WARNING, GithubLabel, acceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
+import { EmbedBuilder, TextChannel } from "discord.js";
+import { bot } from "../main.js";
 
 const filePath = path.join(cwd(), "src", "data", "lastFetch.txt");
 const repoPath = path.join(cwd(), "repo");
@@ -55,6 +57,36 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
 
 function log(...args: any[]) {
   return console.log("=== GIT ===\n", ...args, "\n--- GIT ---")
+}
+
+
+async function sendToMirrorDiscord(pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
+  const embed = new EmbedBuilder()
+    .setTitle(
+      pr.title.length > 100
+      ? pr.title.substring(0, 97) + "..."
+      : pr.title
+    )
+    .setDescription(
+      pr.body
+      ? (
+        pr.body.length > 1000
+        ? pr.body.substring(0, 997) + "..."
+        : pr.body
+      )
+      : "No description provided"
+    )
+    .setColor(EMBED_COLOR_WARNING);
+
+  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
+  const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
+
+  const msg = await channel.send({
+    embeds: [ embed ],
+    components: [ acceptOrVoteMirrorRow ]
+  });
+
+  await mirrorPRs.push({ pr_number: pr.number, message: msg.id });
 }
 
 
@@ -181,6 +213,18 @@ export async function checkRepo() {
           `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
           pr.body
       });
+
+      /////////////////////////////////
+      try {
+        await shared.octokit?.issues.addLabels({
+          owner, repo,
+          issue_number: pr.number,
+          labels: [ githubLabels[GithubLabel.Mirror] ]
+        });
+      } catch (e) {console.error("Epic fail", e);}
+      /////////////////////////////////
+      
+      await sendToMirrorDiscord(pr);
     } catch (e: any) {
       const re = e as RequestError;
       if (!re.message.includes("pull request already exists"))

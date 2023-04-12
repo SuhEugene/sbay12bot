@@ -59,9 +59,13 @@ bot.once("ready", async () => {
   if (!guild || !guild.id)
     throw Error(`Environment guild REPORT_GUILD (${process.env["REPORT_GUILD"]}) does not exist!`)
 
-  const channel = await guild.channels.fetch(process.env["REPORT_CHANNEL"] as string);
-  if (!channel || !channel.id)
+  const reportChannel = await guild.channels.fetch(process.env["REPORT_CHANNEL"] as string);
+  if (!reportChannel || !reportChannel.id)
     throw Error(`Environment channel REPORT_CHANNEL (${process.env["REPORT_CHANNEL"]}) does not exist!`)
+
+  const mirrorChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string);
+    if (!mirrorChannel || !mirrorChannel.id)
+      throw Error(`Environment channel MIRROR_CHANNEL (${process.env["MIRROR_CHANNEL"]}) does not exist!`)
   
   if (!process.env["ALLOWED_ROLES"])
     throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) does not exist!`)
@@ -82,7 +86,7 @@ bot.once("ready", async () => {
   );
   console.log(` Logged in as:   ${bot.user.tag} [${bot.user.id}]`);
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
-  console.log(` Report channel: #${channel.name} [${channel.id}]`);
+  console.log(` Report channel: #${reportChannel.name} [${reportChannel.id}]`);
   console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}${mstone && (', Milestone: '+ mstone)}`);
   console.log(` Fetch GitHub:   ${process.env["GET_REPO"]}`);
 
@@ -123,6 +127,9 @@ async function run() {
 
   if (!process.env["REPORT_CHANNEL"])
     throw Error("Could not find REPORT_CHANNEL in your environment")
+
+  if (!process.env["MIRROR_CHANNEL"])
+    throw Error("Could not find MIRROR_CHANNEL in your environment")
     
   if (!process.env["REPORT_REPO"])
     throw Error("Could not find REPORT_REPO in your environment")

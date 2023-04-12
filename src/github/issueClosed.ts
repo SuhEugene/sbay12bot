@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import { EMBED_COLOR_CLOSED, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared.js";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
-import { getMessage } from "./getMessageByIssue.js";
+import { getMessageByIssue } from "./getMessageByIssue.js";
 
 enum IssueStatus {
   OPEN = "open",
@@ -40,7 +40,7 @@ export async function issueClosed(data: EmitterWebhookEvent<"issues.closed"> | E
   
   console.log(`Issue #${issueNumber} is ${status} now`);
 
-  const msg = await getMessage(issueNumber);
+  const msg = await getMessageByIssue(issueNumber);
   if (!msg) return console.warn(`WARNING! ${data.name}.${data.payload.action} Message for the issue #${issueNumber} not found!`);
 
   const newEmbed = new EmbedBuilder(msg.embeds[0].data)
