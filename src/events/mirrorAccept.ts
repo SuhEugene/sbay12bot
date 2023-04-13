@@ -14,6 +14,8 @@ export class MirrorAccept {
     const mirrors = await mirrorPRs.read();
     const mirror = mirrors.find(e => e.message == interaction.message.id);
 
+    console.log(interaction.message.id, interaction.message);
+
     if (!mirror) return await replyToInteraction(interaction, {
       content: "Ошибка! PR не найден!",
       ephemeral: true
