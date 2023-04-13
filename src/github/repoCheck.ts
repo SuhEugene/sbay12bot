@@ -1,11 +1,11 @@
 import { promises as fs } from "fs";
-import { EMBED_COLOR_WARNING, GithubLabel, acceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
+import { EMBED_COLOR_WARNING, GithubLabel, acceptOrVoteMirrorRow, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
-import { EmbedBuilder, TextChannel } from "discord.js";
+import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
 
 const filePath = path.join(cwd(), "src", "data", "lastFetch.txt");
@@ -84,9 +84,16 @@ async function sendToMirrorDiscord(pr: RestEndpointMethodTypes["pulls"]["list"][
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
   const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
 
+  const githubButton = new ButtonBuilder()
+    .setStyle(ButtonStyle.Link)
+    .setURL(pr.html_url)
+    .setLabel(`GitHub PR #${pr.number}`);
+
+  const row = getAcceptOrVoteMirrorRow(githubButton);
+
   const msg = await channel.send({
     embeds: [ embed ],
-    components: [ acceptOrVoteMirrorRow ]
+    components: [ row ]
   });
 
   await mirrorPRs.push({ pr_number: pr.number, message: msg.id });

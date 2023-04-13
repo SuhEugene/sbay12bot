@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, RestOrArray } from "discord.js";
 import { ArrayIO } from "./utils/arrayIO.js";
 import { cwd } from "process";
 import path from "path";
@@ -81,10 +81,10 @@ const acceptMirrorButton = new ButtonBuilder()
   .setStyle(ButtonStyle.Secondary)
   .setCustomId(ButtonId.MirrorVote);
 
-export const acceptOrVoteMirrorRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-  voteMirrorButton, acceptMirrorButton
+export const getAcceptOrVoteMirrorRow = (...components: MessageActionRowComponentBuilder[]) => new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+  ...components, voteMirrorButton, acceptMirrorButton
 );
-
+export const acceptOrVoteMirrorRow = getAcceptOrVoteMirrorRow();
 
 type sharedType = {
   reportSessions: {[index: string]: ReportTypedData};
