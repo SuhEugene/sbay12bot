@@ -37,6 +37,9 @@ export class MirrorVote {
       components: []
     });
 
+    await interaction.message.react("✅");
+    await interaction.message.react("❌");
+
     const thread = await interaction.message.startThread({
       name: (embed.data.title as string).replace(/\[MIRROR\] ?/i, '')
     });
