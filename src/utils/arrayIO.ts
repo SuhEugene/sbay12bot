@@ -15,6 +15,7 @@ export class ArrayIO<T> {
     try {
       reportsString = String(await readFile(this.filePath));
     } catch (e) {
+      console.error("FS CANNOT READ", e);
       reportsString = "[]";
     }
 
