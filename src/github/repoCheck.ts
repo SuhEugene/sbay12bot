@@ -78,7 +78,8 @@ async function sendToMirrorDiscord(pr: RestEndpointMethodTypes["pulls"]["list"][
       )
       : "No description provided"
     )
-    .setColor(EMBED_COLOR_WARNING);
+    .setColor(EMBED_COLOR_WARNING)
+    .setURL(pr.html_url);
 
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
   const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
@@ -206,7 +207,7 @@ export async function checkRepo() {
     }
     try {
       console.log(`[PRMERGE] Creating pull request...`);
-      await octo.pulls.create({
+      const myPr = await octo.pulls.create({
         owner, repo,
         head: branchName,
         base: "dev220",
@@ -220,7 +221,7 @@ export async function checkRepo() {
       try {
         await shared.octokit?.issues.addLabels({
           owner, repo,
-          issue_number: pr.number,
+          issue_number: myPr.data.number,
           labels: [ githubLabels[GithubLabel.Mirror] ]
         });
       } catch (e) {console.error("Epic fail", e);}
