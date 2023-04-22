@@ -46,7 +46,7 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
         continue;
       if (new Date(pr.merged_at) <= sinceDate)
         continue;
-      if(pr.title.startsWith("Bump actions/checkout"))
+      if(pr.title.startsWith("Bump actions/"))
         continue;
 
       PRs.push(pr);
