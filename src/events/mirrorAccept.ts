@@ -29,7 +29,11 @@ export class MirrorAccept {
 
     const embed = new EmbedBuilder(interaction.message.embeds[0] as APIEmbed)
       .setColor(EMBED_COLOR_SUCCESS)
-      .setFooter({ text: "Принято" })
+      .setFooter({
+        text: interaction.user.tag,
+        iconURL: interaction.user.avatar || undefined
+      })
+      .setAuthor({ name: "Принято" })
       .setTimestamp();
     
     await interaction.message.edit({

@@ -29,7 +29,11 @@ export class MirrorVote {
 
     const embed = new EmbedBuilder(interaction.message.embeds[0] as APIEmbed)
       .setColor(EMBED_COLOR_DEFAULT)
-      .setFooter({ text: "Голосование" })
+      .setFooter({
+        text: interaction.user.tag,
+        iconURL: interaction.user.avatar || undefined
+      })
+      .setAuthor({ name: "Голосование" })
       .setTimestamp();
     
     await interaction.message.edit({
