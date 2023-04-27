@@ -31,7 +31,7 @@ export class MirrorAccept {
       .setColor(EMBED_COLOR_SUCCESS)
       .setFooter({
         text: interaction.user.tag,
-        iconURL: interaction.user.avatar || undefined
+        iconURL: interaction.user.avatarURL() || undefined
       })
       .setAuthor({ name: "Принято" })
       .setTimestamp();

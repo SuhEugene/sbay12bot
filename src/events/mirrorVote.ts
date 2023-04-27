@@ -31,7 +31,7 @@ export class MirrorVote {
       .setColor(EMBED_COLOR_DEFAULT)
       .setFooter({
         text: interaction.user.tag,
-        iconURL: interaction.user.avatar || undefined
+        iconURL: interaction.user.avatarURL() || undefined
       })
       .setAuthor({ name: "Голосование" })
       .setTimestamp();
