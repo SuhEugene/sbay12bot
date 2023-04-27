@@ -234,7 +234,7 @@ export async function checkRepo() {
       } catch (e) {console.error("Epic fail", e);}
       /////////////////////////////////
       
-      await sendToMirrorDiscord(pr);
+      await sendToMirrorDiscord(myPr);
     } catch (e: any) {
       const re = e as RequestError;
       if (!re.message.includes("pull request already exists"))
