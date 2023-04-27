@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js";
-import { Discord, SimpleCommand, SimpleCommandMessage, SimpleCommandOption, SimpleCommandOptionType } from "discordx";
-
+import { Discord, SimpleCommand, SimpleCommandMessage } from "discordx";
+import { bot } from "../main.js"
 @Discord()
 export class RemoveMsg {
   @SimpleCommand({ name: "rmall", argSplitter: " " })
@@ -11,6 +11,9 @@ export class RemoveMsg {
     console.log("Cleaning ", command.message.channel.id);
     const ch = await command.message.channel.fetch() as TextChannel;
   
-    await ch.bulkDelete(100, true);
+    const msgs = (await ch.messages.fetch({ limit: 100 })).filter(msg => msg.author.id == bot.user?.id);
+    msgs.forEach(async msg => {
+      if(msg.deletable) await msg.delete();
+    });
   }
 }
