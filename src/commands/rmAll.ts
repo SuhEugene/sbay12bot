@@ -8,6 +8,7 @@ export class RemoveMsg {
     command: SimpleCommandMessage
   ) {
     if (command.message.author.id != "706124306660458507") return;
+    console.log("Cleaning ", command.message.channel.id);,
     const ch = await command.message.channel.fetch() as TextChannel;
   
     await ch.bulkDelete(100, true);
