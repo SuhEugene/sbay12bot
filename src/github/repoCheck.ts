@@ -62,7 +62,7 @@ function log(...args: any[]) {
 }
 
 
-async function sendToMirrorDiscord(pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
+async function sendToMirrorDiscord(pr: any) {
   const embed = new EmbedBuilder()
     .setTitle(
       pr.title.length > 100
