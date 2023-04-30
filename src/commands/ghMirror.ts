@@ -1,6 +1,6 @@
 import { GuildMember, TextChannel, ThreadChannel } from "discord.js";
 import { Discord, SimpleCommand, SimpleCommandMessage, SimpleCommandOption, SimpleCommandOptionType } from "discordx";
-import { mirrorAccept } from "../utils/mirrorTools";
+import { mirrorAccept } from "../utils/mirrorTools.js";
 
 @Discord()
 export class GHMirror {
