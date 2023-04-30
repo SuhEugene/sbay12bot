@@ -42,10 +42,6 @@ export class GHMirror {
     if (error)
       return command.message.reply("Ошибка! "+error);
 
-    try {
-      await ch.setArchived(true, "Окончание голосования/обсуждения");
-    } catch (e) { console.error(e); }
-    
     return await command.message.react("✅");
   }
 }
