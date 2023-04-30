@@ -32,7 +32,7 @@ export class GHMirror {
       return await command.message.react("❌");
 
     const ch = await command.message.channel.fetch();
-    if (!(ch instanceof ThreadChannel))
+    if (!(ch instanceof ThreadChannel) || !ch.isThread())
       return await command.message.react("😵‍💫");
 
     const msg = await ch.fetchStarterMessage();
@@ -41,6 +41,10 @@ export class GHMirror {
     const error = await mirrorAccept(msg, command.message.author);
     if (error)
       return command.message.reply("Ошибка! "+error);
+
+    try {
+      await ch.setArchived(true, "Окончание голосования/обсуждения");
+    } catch (e) { console.error(e); }
     
     return await command.message.react("✅");
   }
