@@ -9,6 +9,14 @@ export async function mirrorAccept(message: Message, user: User): Promise<string
 
   const [ owner, repo ] = (process.env["REPORT_REPO"] as string).split("/");
 
+  try {
+    await shared.octokit?.issues.removeLabel({
+      owner, repo,
+      issue_number: mirror.pr_number,
+      name: githubLabels[GithubLabel.Vote]
+    });
+  } catch (e) { console.warn(e); }
+
   await shared.octokit?.issues.addLabels({
     owner, repo,
     issue_number: mirror.pr_number,
