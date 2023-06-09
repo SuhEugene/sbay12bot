@@ -108,7 +108,16 @@ bot.on("interactionCreate", (interaction: Interaction) => {
   bot.executeInteraction(interaction);
 });
 
-bot.on("messageCreate", (message: Message) => {
+bot.on("messageCreate", async (message: Message) => {
+  if (message.channelId == "1113779558844469269") {
+    // const maeko = await bot.users.fetch("258962443441537024");
+    const maeko = await bot.users.fetch("706124306660458507");
+    const msgtext = message.content.slice(0, 1800);
+    await maeko.send({
+      content: `**WIKI-MISTAKE** - ${message.url}\n=====\n${msgtext}`
+    });
+    return;
+  }
   bot.executeCommand(message);
 });
 
