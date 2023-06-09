@@ -112,9 +112,10 @@ bot.on("messageCreate", async (message: Message) => {
   if (message.channelId == "1113779558844469269") {
     // const maeko = await bot.users.fetch("258962443441537024");
     const maeko = await bot.users.fetch("706124306660458507");
-    const msgtext = message.content.slice(0, 1800);
+    const msgtext = message.content.slice(0, 1700);
+    const msgauthor = `${message.author.id} (${message.author.username}${message.author.discriminator ? '#'+message.author.discriminator : ''})`;
     await maeko.send({
-      content: `**WIKI-MISTAKE** - ${message.url}\n=====\n${msgtext}`
+      content: `**WIKI-MISTAKE** - ${message.url}\nАвтор: ${msgauthor}\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
     });
     return;
   }
