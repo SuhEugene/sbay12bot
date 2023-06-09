@@ -117,6 +117,7 @@ bot.on("messageCreate", async (message: Message) => {
     await maeko.send({
       content: `### WIKI-MISTAKE\nАвтор: ${msgauthor}\nСсылка: ${message.url}\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
     });
+    console.log(`>> SENT ${message.id} TO MAEKO!`);
     return;
   }
   bot.executeCommand(message);
