@@ -113,9 +113,9 @@ bot.on("messageCreate", async (message: Message) => {
     // const maeko = await bot.users.fetch("258962443441537024");
     const maeko = await bot.users.fetch("706124306660458507");
     const msgtext = message.content.slice(0, 1700);
-    const msgauthor = `${message.author.id} (${message.author.username}${(message.author.discriminator != "0") ? '#'+message.author.discriminator : '@'})`;
+    const msgauthor = `<@!${message.author.id}> (${(message.author.discriminator != "0") ? (message.author.username+'#'+message.author.discriminator) : ('@'+message.author.username)})`;
     await maeko.send({
-      content: `**WIKI-MISTAKE** - ${message.url}\nАвтор: <@!${msgauthor}>\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
+      content: `**WIKI-MISTAKE** - ${message.url}\nАвтор: ${msgauthor}\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
     });
     return;
   }
