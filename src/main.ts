@@ -115,7 +115,7 @@ bot.on("messageCreate", async (message: Message) => {
     const msgtext = message.content.slice(0, 1700);
     const msgauthor = `<@!${message.author.id}> (${(message.author.discriminator != "0") ? (message.author.username+'#'+message.author.discriminator) : ('@'+message.author.username)})`;
     await maeko.send({
-      content: `**WIKI-MISTAKE** - ${message.url}\nАвтор: ${msgauthor}\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
+      content: `### WIKI-MISTAKE\nАвтор: ${msgauthor}\nСсылка: ${message.url}\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
     });
     return;
   }
