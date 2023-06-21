@@ -225,6 +225,8 @@ export async function checkRepo() {
       } catch (e) {
         try {
           console.log(`[PRMERGE] Failed to create PR! Creating failed PR...`);
+          console.log(`[PRMERGE][FAIL] Resetting to dev220...`);
+          await git.reset(["dev220", "--hard"], log);
           console.log(`[PRMERGE][FAIL] Requesting patch for PR #${pr.number}...`);
           const patch = await octo.request(pr.patch_url);
           console.log(`[PRMERGE][FAIL] Writing patch for PR #${pr.number}...`);
