@@ -41,6 +41,7 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
   for await (const page of prPaginator) {
     for (const pr of page.data) {
       if (new Date(pr.updated_at) <= sinceDate)  { end = true; break; }
+      if (pr.number == 33625) continue;
 
       if (!pr.merged_at)
         continue;
