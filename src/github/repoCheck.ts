@@ -224,9 +224,19 @@ export async function checkRepo() {
       } catch (e) {
         try {
           console.log(`[PRMERGE] Failed to create PR! Creating failed PR...`);
+          console.log(`[PRMERGE][FAIL] Requesting patch for PR #${pr.number}...`);
+          const patch = await octo.request(pr.patch_url);
+          console.log(`[PRMERGE][FAIL] Writing patch for PR #${pr.number}...`);
+          await fs.writeFile(patchFileName, patch.data as string, "utf-8");
+          console.log(`[PRMERGE][FAIL] Applying REJ patch for PR #${pr.number}...`);
           await git.applyPatch(patchFileName, ["--reject",  "--whitespace=fix"], log);
+          console.log(`[PRMERGE][FAIL] Deleting patch file...`);
+          await fs.unlink(patchFileName);
+          console.log(`[PRMERGE][FAIL] Adding everything to commit...`);
           await git.add(".", log);
+          console.log(`[PRMERGE][FAIL] Commiting without author...`);
           await git.raw("commit", "-m", `[MIRROR][FAILED] ${pr.title}`, log);
+          console.log(`[PRMERGE][FAIL] Pushing to origin/${branchName}...`);
           await git.push("origin", branchName, undefined, log);
           myPr = await octo.pulls.create({
             owner, repo, head: branchName, base: "dev220",
