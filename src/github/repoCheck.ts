@@ -1,11 +1,11 @@
 import { promises as fs } from "fs";
-import { EMBED_COLOR_WARNING, GithubLabel, acceptOrVoteMirrorRow, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
+import { EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { CleanOptions, ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
-import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, TextChannel } from "discord.js";
+import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
 
 const filePath = path.join(cwd(), "src", "data", "lastFetch.txt");
@@ -62,9 +62,14 @@ function log(...args: any[]) {
   return console.log("=== GIT ===\n", ...args, "\n--- GIT ---")
 }
 
+type PRData = {
+  title: string,
+  body: null | string,
+  html_url: string,
+  number: number
+};
 
-async function sendToMirrorDiscord(prResponse: RestEndpointMethodTypes["pulls"]["create"]["response"]) {
-  const pr = prResponse.data;
+async function sendToMirrorDiscord(pr: PRData) {
   const embed = new EmbedBuilder()
     .setTitle(
       pr.title.length > 100
@@ -215,27 +220,33 @@ export async function checkRepo() {
       console.error("CANNOT PUSH, FORCING!!!", e);
       await git.raw(["push", "origin", branchName, "--force"], log);
     }
+    let myPr;
     try {
       console.log(`[PRMERGE] Creating pull request...`);
-      let myPr;
       try {
-        myPr = await octo.pulls.create({
+        myPr = (await octo.pulls.create({
           owner, repo, head: branchName, base: "dev220",
           title: `[MIRROR] ${pr.title}`,
           body:
             `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
             pr.body
-        });
-      } catch (e) {
-        console.error("FATAL FATAL FATAL FATAL FATAL");
-        console.error(e);
-        process.exit(0);  
+        })).data;
+      } catch (e: any) {
+        if (!e.message.includes("A pull request already exists")) {
+          console.error("FATAL FATAL FATAL FATAL FATAL");
+          console.error(e);
+          process.exit(0);
+        } else {
+          myPr = (await octo.pulls.list({
+            owner, repo, head: branchName, base: "dev220"
+          })).data[0];
+        }
       }
 
       /////////////////////////////////
       try {
         await shared.octokit?.issues.addLabels({
-          owner, repo, issue_number: myPr.data.number,
+          owner, repo, issue_number: myPr.number,
           labels: [ githubLabels[GithubLabel.Mirror] ]
         });
       } catch (e) {console.error("Epic fail", e);}
