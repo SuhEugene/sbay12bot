@@ -140,6 +140,9 @@ export async function checkRepo() {
     console.log("[PRMERGE] Fetching everything...");
     await git.fetch("", ["--all"], log);
 
+    console.log(`[PRMERGE] Resetting everythong...`);
+    await git.reset(["HEAD", "--hard"], log);
+
     console.log("[PRMERGE] Checking out dev220...")
     await git.checkout("dev220");
     
