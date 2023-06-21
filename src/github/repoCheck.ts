@@ -212,7 +212,7 @@ export async function checkRepo() {
     } catch (e) {
       console.log(`[PRMERGE] Force pushing to origin/${branchName}...`);
       console.error("CANNOT PUSH, FORCING!!!", e);
-      await git.push("origin", branchName, ["-f"], log);
+      await git.push("origin", branchName, ["--force"], log);
     }
     try {
       console.log(`[PRMERGE] Creating pull request...`);
@@ -242,8 +242,14 @@ export async function checkRepo() {
           await git.add(".", log);
           console.log(`[PRMERGE][FAIL] Commiting without author...`);
           await git.raw("commit", "-m", `[MIRROR][FAILED] ${pr.title}`, log);
-          console.log(`[PRMERGE][FAIL] Pushing to origin/${branchName}...`);
-          await git.push("origin", branchName, undefined, log);
+          try {
+            console.log(`[PRMERGE][FAIL] Pushing to origin/${branchName}...`);
+            await git.push("origin", branchName, undefined, log);
+          } catch (e) {
+            console.log(`[PRMERGE][FAIL] Force pushing to origin/${branchName}...`);
+            console.error("CANNOT PUSH, FORCING!!!", e);
+            await git.push("origin", branchName, ["-f"], log);
+          }
           myPr = await octo.pulls.create({
             owner, repo, head: branchName, base: "dev220",
             title: `[MIRROR] ${pr.title}`,
