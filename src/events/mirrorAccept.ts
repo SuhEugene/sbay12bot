@@ -8,7 +8,7 @@ import { mirrorAccept } from "../utils/mirrorTools.js";
 export class MirrorAccept {
   @ButtonComponent({ id: ButtonId.MirrorAccept })
   async acceptMirror(interaction: ButtonInteraction) {
-    if (interaction.user.id != "706124306660458507") return await replyToInteraction(interaction, {
+    if (interaction.user.id != "706124306660458507" && interaction.user.id != (process.env["SPECIAL"] as string)) return await replyToInteraction(interaction, {
       content: "Пока что это тыкать может только Юджин!",
       ephemeral: true
     }); 
