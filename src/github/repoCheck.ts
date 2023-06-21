@@ -3,7 +3,7 @@ import { EMBED_COLOR_WARNING, GithubLabel, acceptOrVoteMirrorRow, getAcceptOrVot
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
-import simpleGit, { ResetMode } from "simple-git";
+import simpleGit, { CleanOptions, ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
 import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
@@ -142,7 +142,8 @@ export async function checkRepo() {
     await git.fetch("", ["--all"], log);
 
     console.log(`[PRMERGE] Resetting everythong...`);
-    await git.reset(["HEAD", "--hard"], log);
+    await git.reset(ResetMode.HARD, log);
+    await git.clean(CleanOptions.FORCE + CleanOptions.RECURSIVE, log);
 
     console.log("[PRMERGE] Checking out dev220...")
     await git.checkout("dev220");
@@ -212,7 +213,7 @@ export async function checkRepo() {
     } catch (e) {
       console.log(`[PRMERGE] Force pushing to origin/${branchName}...`);
       console.error("CANNOT PUSH, FORCING!!!", e);
-      await git.push("origin", branchName, ["--force"], log);
+      await git.raw(["push", "origin", branchName, "--force"], log);
     }
     try {
       console.log(`[PRMERGE] Creating pull request...`);
