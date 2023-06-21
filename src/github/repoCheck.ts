@@ -226,48 +226,9 @@ export async function checkRepo() {
             pr.body
         });
       } catch (e) {
-        try {
-          console.log(`[PRMERGE] Failed to create PR! Creating failed PR...`);
-          console.log(`[PRMERGE][FAIL] Resetting to dev220...`);
-          await git.reset(["dev220", "--hard"], log);
-          console.log(`[PRMERGE][FAIL] Requesting patch for PR #${pr.number}...`);
-          const patch = await octo.request(pr.patch_url);
-          console.log(`[PRMERGE][FAIL] Writing patch for PR #${pr.number}...`);
-          await fs.writeFile(patchFileName, patch.data as string, "utf-8");
-          console.log(`[PRMERGE][FAIL] Applying REJ patch for PR #${pr.number}...`);
-          await git.applyPatch(patchFileName, ["--reject",  "--whitespace=fix"], log);
-          console.log(`[PRMERGE][FAIL] Deleting patch file...`);
-          await fs.unlink(patchFileName);
-          console.log(`[PRMERGE][FAIL] Adding everything to commit...`);
-          await git.add(".", log);
-          console.log(`[PRMERGE][FAIL] Commiting without author...`);
-          await git.raw("commit", "-m", `[MIRROR][FAILED] ${pr.title}`, log);
-          try {
-            console.log(`[PRMERGE][FAIL] Pushing to origin/${branchName}...`);
-            await git.push("origin", branchName, undefined, log);
-          } catch (e) {
-            console.log(`[PRMERGE][FAIL] Force pushing to origin/${branchName}...`);
-            console.error("CANNOT PUSH, FORCING!!!", e);
-            await git.push("origin", branchName, ["-f"], log);
-          }
-          myPr = await octo.pulls.create({
-            owner, repo, head: branchName, base: "dev220",
-            title: `[MIRROR] ${pr.title}`,
-            body:
-              `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
-              pr.body
-          });
-          try {
-            await shared.octokit?.issues.addLabels({
-              owner, repo, issue_number: myPr.data.number,
-              labels: [ githubLabels[GithubLabel.Mirror] ]
-            });
-          } catch {}
-        } catch (e) {
-          console.error("FATAL FATAL FATAL FATAL FATAL");
-          console.error(e);
-          process.exit(0);  
-        }
+        console.error("FATAL FATAL FATAL FATAL FATAL");
+        console.error(e);
+        process.exit(0);  
       }
 
       /////////////////////////////////
