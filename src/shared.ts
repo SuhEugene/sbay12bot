@@ -160,13 +160,14 @@ export const reportLabels = {
 }
 
 export enum GithubLabel {
-  Vote, Accepted, Mirror
+  Vote, Accepted, Mirror, Fail
 }
 
 export const githubLabels = {
   [GithubLabel.Vote]: ":hourglass: Ожидание голосования",
   [GithubLabel.Accepted]: ":white_check_mark: Принято",
-  [GithubLabel.Mirror]: ":mirror: MIR ЯОЯ"
+  [GithubLabel.Mirror]: ":mirror: MIR ЯОЯ",
+  [GithubLabel.Fail]: ":-1: FAILED"
 }
 
 export const SECONDS = 1000;

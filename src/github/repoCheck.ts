@@ -215,21 +215,46 @@ export async function checkRepo() {
     }
     try {
       console.log(`[PRMERGE] Creating pull request...`);
-      const myPr = await octo.pulls.create({
-        owner, repo,
-        head: branchName,
-        base: "dev220",
-        title: `[MIRROR] ${pr.title}`,
-        body:
-          `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
-          pr.body
-      });
+      let myPr;
+      try {
+        myPr = await octo.pulls.create({
+          owner, repo, head: branchName, base: "dev220",
+          title: `[MIRROR] ${pr.title}`,
+          body:
+            `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
+            pr.body
+        });
+      } catch (e) {
+        try {
+          console.log(`[PRMERGE] Failed to create PR! Creating failed PR...`);
+          await git.applyPatch(patchFileName, ["--reject",  "--whitespace=fix"], log);
+          await git.add(".", log);
+          await git.raw("commit", "-m", `[MIRROR][FAILED] ${pr.title}`, log);
+          await git.push("origin", branchName, undefined, log);
+          myPr = await octo.pulls.create({
+            owner, repo, head: branchName, base: "dev220",
+            title: `[MIRROR] ${pr.title}`,
+            body:
+              `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
+              pr.body
+          });
+          try {
+            await shared.octokit?.issues.addLabels({
+              owner, repo, issue_number: myPr.data.number,
+              labels: [ githubLabels[GithubLabel.Mirror] ]
+            });
+          } catch {}
+        } catch (e) {
+          console.error("FATAL FATAL FATAL FATAL FATAL");
+          console.error(e);
+          process.exit(0);  
+        }
+      }
 
       /////////////////////////////////
       try {
         await shared.octokit?.issues.addLabels({
-          owner, repo,
-          issue_number: myPr.data.number,
+          owner, repo, issue_number: myPr.data.number,
           labels: [ githubLabels[GithubLabel.Mirror] ]
         });
       } catch (e) {console.error("Epic fail", e);}
