@@ -137,11 +137,8 @@ export async function checkRepo() {
     console.log("\n\n>>> PR NUMBER "+ pr.number)
     const branchName = `upstream-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
-    console.log("[PRMERGE] Fetching origin...");
-    await git.fetch("origin");
-
-    console.log("[PRMERGE] Fetching upstream...");
-    await git.fetch("upstream");
+    console.log("[PRMERGE] Fetching everything...");
+    await git.fetch("", ["--all"], log);
 
     console.log("[PRMERGE] Checking out dev220...")
     await git.checkout("dev220");
