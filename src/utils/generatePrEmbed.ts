@@ -37,5 +37,5 @@ export default function generatePrEmbed(title: string, description: string, stat
       name: author.name || author.login
     })
     .setURL(url)
-    .setFooter({ text: "Status: "+ capitalize(status) });
+    .setFooter({ text: status == "merged" ? capitalize(status) : `${capitalize(status)} Pull Request` });
 }
