@@ -12,7 +12,9 @@ const colorsByStatus = {
   "draft": EMBED_COLOR_DISMISSED
 }
 
-export default function generatePrEmbed(title: string, description: string, status: keyof typeof colorsByStatus, author: User) {
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
+export default function generatePrEmbed(title: string, description: string, status: keyof typeof colorsByStatus, author: User, url: string) {
   
   description = description.replaceAll(commentRegexp, "");
 
@@ -30,5 +32,7 @@ export default function generatePrEmbed(title: string, description: string, stat
     .setAuthor({
       iconURL: author.avatar_url,
       name: author.name || author.login
-    });
+    })
+    .setURL(url)
+    .setFooter({ text: capitalize(status) });
 }

@@ -28,7 +28,7 @@ export async function prOpenUpdate(data: PrOpenDataTypes) {
   const msg = await getMessageByPr(pr.number);
   if (msg && msg.deletable) await msg.delete();
 
-  const newEmbed = generatePrEmbed(pr.title, pr.body || "", status, pr.user);
+  const newEmbed = generatePrEmbed(pr.title, pr.body || "", status, pr.user, pr.html_url);
   const sentMsg = await channel.send({ embeds: [ newEmbed ] });
 
   unmergedPRs.data = (await unmergedPRs.read()).filter(p => p.pr_number != pr.number);
