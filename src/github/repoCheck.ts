@@ -70,22 +70,6 @@ type PRData = {
 };
 
 async function sendToMirrorDiscord(pr: PRData) {
-  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
-  const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
-
-  const tmpembed = new EmbedBuilder()
-    .setTitle(
-      pr.title.length > 100
-      ? pr.title.substring(0, 97) + "..."
-      : pr.title
-    )
-    .setColor(EMBED_COLOR_DEFAULT)
-    .setURL(pr.html_url);
-
-  if (tmpembed) return await channel.send({ embeds: [ tmpembed ] });
-
-  /// UNREACHABLE BELOW
-
   const embed = new EmbedBuilder()
     .setTitle(
       pr.title.length > 100
@@ -103,6 +87,9 @@ async function sendToMirrorDiscord(pr: PRData) {
     )
     .setColor(EMBED_COLOR_WARNING)
     .setURL(pr.html_url);
+
+  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
+  const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
 
   const githubButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Link)
@@ -265,7 +252,7 @@ export async function checkRepo() {
       } catch (e) {console.error("Epic fail", e);}
       /////////////////////////////////
       
-      await sendToMirrorDiscord(myPr);
+      // await sendToMirrorDiscord(myPr);
     } catch (e: any) {
       const re = e as RequestError;
       if (!re.message.includes("pull request already exists"))
