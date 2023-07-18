@@ -37,5 +37,5 @@ export default function generatePrEmbed(title: string, description: string, stat
       name: author.name || author.login
     })
     .setURL(url)
-    .setFooter({ text: capitalize(status) });
+    .setFooter({ text: "Status: "+ capitalize(status) });
 }
