@@ -16,6 +16,7 @@ const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 
 export default function generatePrEmbed(title: string, description: string, status: keyof typeof colorsByStatus, author: User, url: string) {
   
+  description = description.replaceAll("\r\n", "\n");
   description = description.replaceAll(commentRegexp, "");
 
   const checkMatches = description.matchAll(checkRegexp);
