@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
+import { EMBED_COLOR_DEFAULT, EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
@@ -70,6 +70,22 @@ type PRData = {
 };
 
 async function sendToMirrorDiscord(pr: PRData) {
+  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
+  const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
+
+  const tmpembed = new EmbedBuilder()
+    .setTitle(
+      pr.title.length > 100
+      ? pr.title.substring(0, 97) + "..."
+      : pr.title
+    )
+    .setColor(EMBED_COLOR_DEFAULT)
+    .setURL(pr.html_url);
+
+  if (tmpembed) return await channel.send({ embeds: [ tmpembed ] });
+
+  /// UNREACHABLE BELOW
+
   const embed = new EmbedBuilder()
     .setTitle(
       pr.title.length > 100
@@ -87,9 +103,6 @@ async function sendToMirrorDiscord(pr: PRData) {
     )
     .setColor(EMBED_COLOR_WARNING)
     .setURL(pr.html_url);
-
-  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
-  const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
 
   const githubButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Link)
@@ -140,7 +153,7 @@ export async function checkRepo() {
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
 
   for (const pr of prs) {
-    console.log("\n\n>>> PR NUMBER "+ pr.number)
+    console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
     const branchName = `upstream-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
     console.log("[PRMERGE] Fetching everything...");
@@ -150,20 +163,20 @@ export async function checkRepo() {
     await git.reset(ResetMode.HARD, log);
     await git.clean(CleanOptions.FORCE + CleanOptions.RECURSIVE, log);
 
-    console.log("[PRMERGE] Checking out dev220...")
-    await git.checkout("dev220");
+    console.log("[PRMERGE] Checking out dev-sierra...")
+    await git.checkout("dev-sierra");
     
-    console.log("[PRMERGE] Pulling origin dev220...")
-    await git.pull("origin", "dev220");
+    console.log("[PRMERGE] Pulling origin dev-sierra...")
+    await git.pull("origin", "dev-sierra");
     try {
-      console.log(`[PRMERGE] Checking out ${branchName} from dev220...`);
-      await git.checkoutBranch(branchName, "dev220");
+      console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra...`);
+      await git.checkoutBranch(branchName, "dev-sierra");
     } catch (e) {
       console.log(`[PRMERGE] Deleting branch ${branchName}...`);
       await git.deleteLocalBranch(branchName, true);
 
-      console.log(`[PRMERGE] Checking out ${branchName} from dev220 again...`);
-      await git.checkoutBranch(branchName, "dev220");
+      console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra again...`);
+      await git.checkoutBranch(branchName, "dev-sierra");
     }
 
     console.log(`[PRMERGE] Requesting patch for PR #${pr.number}...`);
@@ -175,7 +188,7 @@ export async function checkRepo() {
     try {
       console.log(`[PRMERGE] Applying patch for PR #${pr.number}...`);
       await git.applyPatch(patchFileName, ["--3way"], log);
-  } catch (e: any) {
+    } catch (e: any) {
 
       console.log(`[PRMERGE] Counting fails and successes...`);
       const fails = 0
@@ -225,7 +238,7 @@ export async function checkRepo() {
       console.log(`[PRMERGE] Creating pull request...`);
       try {
         myPr = (await octo.pulls.create({
-          owner, repo, head: branchName, base: "dev220",
+          owner, repo, head: branchName, base: "dev-sierra",
           title: `[MIRROR] ${pr.title}`,
           body:
             `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
@@ -238,7 +251,7 @@ export async function checkRepo() {
           process.exit(0);
         } else {
           myPr = (await octo.pulls.list({
-            owner, repo, head: branchName, base: "dev220"
+            owner, repo, head: branchName, base: "dev-sierra"
           })).data[0];
         }
       }
