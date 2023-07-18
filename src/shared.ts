@@ -175,10 +175,16 @@ export const MINUTES = SECONDS*60;
 export const HOURS = MINUTES*60;
 export const DAYS = HOURS*24;
 
-type PrData = {
+type MirrorPrData = {
   message: string,
   pr_number: number,
   started_at?: number
 }
 
-export const mirrorPRs = new ArrayIO<PrData>(path.join(cwd(), "src", "data", "mirrors.json"));
+type UnmergedPrData = {
+  message: string,
+  pr_number: number
+}
+
+export const mirrorPRs = new ArrayIO<MirrorPrData>(path.join(cwd(), "src", "data", "mirrors.json"));
+export const unmergedPRs = new ArrayIO<UnmergedPrData>(path.join(cwd(), "src", "data", "everything_unmerged.json"));
