@@ -2,7 +2,7 @@ import { EMBED_COLOR_CLOSED, EMBED_COLOR_DANGER, EMBED_COLOR_DISMISSED, EMBED_CO
 import type { User } from "@octokit/webhooks-types";
 import { EmbedBuilder } from "discord.js";
 
-const commentRegexp = /<!--.*?-->/g;
+const commentRegexp = /<!--(.|\n)*?-->/g;
 const checkRegexp = /(^|\n)(?<everything>(?<prefix>-\s)(?<box>\[(x|\s)\])(?<suffix>\s[^\[\(\)\]]))/g;
 
 const colorsByStatus = {
@@ -24,6 +24,9 @@ export default function generatePrEmbed(title: string, description: string, stat
     const { everything, prefix, box, suffix } = match.groups;
     description = description.replace(everything, `${prefix}\`${box}\`${suffix}`);
   }
+
+  while (description.includes("\n\n\n"))
+    description = description.replace("\n\n\n", "\n\n");
 
   return new EmbedBuilder()
     .setTitle(title.length > 100 ? title.slice(0, 97) + "..." : title)
