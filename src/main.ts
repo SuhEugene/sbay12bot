@@ -100,7 +100,7 @@ bot.once("ready", async () => {
 
   console.log("=============");
 
-  setInterval(checkRepo, 30*MINUTES);
+  setInterval(checkRepo, 5*MINUTES);
   checkRepo();
 });
 
