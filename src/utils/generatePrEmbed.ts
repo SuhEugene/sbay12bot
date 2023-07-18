@@ -2,7 +2,7 @@ import { EMBED_COLOR_CLOSED, EMBED_COLOR_DANGER, EMBED_COLOR_DISMISSED, EMBED_CO
 import type { User } from "@octokit/webhooks-types";
 import { EmbedBuilder } from "discord.js";
 
-const commentRegexp = /<!--(.|\n)*?-->/g;
+const commentRegexp = /<!--(.|\n|\r)*?-->/g;
 const checkRegexp = /(^|\n)(?<everything>(?<prefix>-\s)(?<box>\[(x|\s)\])(?<suffix>\s[^\[\(\)\]]))/g;
 
 const colorsByStatus = {
