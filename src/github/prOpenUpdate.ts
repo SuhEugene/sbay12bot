@@ -29,12 +29,12 @@ export async function prOpenUpdate(data: PrOpenDataTypes) {
   if (msg && msg.deletable) await msg.delete();
 
   const newEmbed = generatePrEmbed(pr.title, pr.body || "", status, pr.user);
-  await channel.send({ embeds: [ newEmbed ] });
+  const sentMsg = await channel.send({ embeds: [ newEmbed ] });
 
-  if (pr.state == "closed") {
-    unmergedPRs.data = (await unmergedPRs.read()).filter(pr => pr.pr_number != pr.pr_number);
-    unmergedPRs.write();
-  }
+  unmergedPRs.data = (await unmergedPRs.read()).filter(p => p.pr_number != pr.number);
+  await unmergedPRs.write();
+  if (pr.state != "closed")
+    await unmergedPRs.push({ pr_number: pr.number, message: sentMsg.id });
 
   return true;
 };
