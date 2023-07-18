@@ -1,4 +1,4 @@
-import { EMBED_COLOR_CLOSED, EMBED_COLOR_DANGER, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared";
+import { EMBED_COLOR_CLOSED, EMBED_COLOR_DANGER, EMBED_COLOR_DISMISSED, EMBED_COLOR_OPEN } from "../shared.js";
 import type { User } from "@octokit/webhooks-types";
 import { EmbedBuilder } from "discord.js";
 
