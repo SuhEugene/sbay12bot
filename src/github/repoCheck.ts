@@ -14,7 +14,7 @@ const git = simpleGit(repoPath);
 
 
 async function getSinceDate() {
-  let sinceDate = new Date(1680383635141);
+  let sinceDate = new Date(1689655972583);
   try {
     const got = await fs.readFile(filePath, "utf-8");
     if (got) sinceDate = new Date(got);
