@@ -106,7 +106,9 @@ async function sendToMirrorDiscord(pr: PRData) {
   await mirrorPRs.push({ pr_number: pr.number, message: msg.id });
 }
 
-function checkForCl(body: string, username: string) {
+function checkForCl(body = '', username = '') {
+  if (!body || !username) return body;
+
   const CL_BODY = /(?<cl1>:cl:|🆑)(?<author>.+)?(?<rest>\r?\n(.|\n|\r)+?\r?\n\/(:cl:|🆑))/;
   const match = body.match(CL_BODY);
 
