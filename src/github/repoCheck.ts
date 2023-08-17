@@ -106,6 +106,16 @@ async function sendToMirrorDiscord(pr: PRData) {
   await mirrorPRs.push({ pr_number: pr.number, message: msg.id });
 }
 
+function checkForCl(body: string, username: string) {
+  const CL_BODY = /(?<cl1>:cl:|🆑)(?<author>.+)?(?<rest>\r?\n(.|\n|\r)+?\r?\n\/(:cl:|🆑))/;
+  const match = body.match(CL_BODY);
+
+  if (!match || !match.groups?.cl1) return body;
+  if (match.groups.author.trim()) return body;
+
+  return body.replace(match[0], `${match.groups.cl1}${username}${match.groups.rest}`);
+}
+
 
 export async function checkRepo() {
   const octo = shared.octokit;
@@ -229,7 +239,7 @@ export async function checkRepo() {
           title: `[MIRROR] ${pr.title}`,
           body:
             `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
-            pr.body
+            checkForCl(pr.body, pr.user?.login)
         })).data;
       } catch (e: any) {
         if (!e.message.includes("A pull request already exists")) {
