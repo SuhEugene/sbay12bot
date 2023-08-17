@@ -113,7 +113,7 @@ function checkForCl(body = '', username = '') {
   const match = body.match(CL_BODY);
 
   if (!match || !match.groups?.cl1) return body;
-  if (match.groups.author.trim()) return body;
+  if (match.groups.author?.trim()) return body;
 
   console.log(">>> INSERTING AUTHOR "+username);
 
