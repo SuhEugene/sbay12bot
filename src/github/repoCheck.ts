@@ -243,7 +243,7 @@ export async function checkRepo() {
           title: `[MIRROR] ${pr.title}`,
           body:
             `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
-            checkForCl(pr.body, pr.user?.login)
+            checkForCl(pr.body || '', pr.user?.login)
         })).data;
       } catch (e: any) {
         if (!e.message.includes("A pull request already exists")) {
