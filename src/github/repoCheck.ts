@@ -13,8 +13,9 @@ const repoPath = path.join(cwd(), "repo");
 const git = simpleGit(repoPath);
 
 
+
 async function getSinceDate() {
-  let sinceDate = new Date(1689655972583);
+  let sinceDate = new Date(1691154218000);
   try {
     const got = await fs.readFile(filePath, "utf-8");
     if (got) sinceDate = new Date(got);
@@ -155,6 +156,7 @@ export async function checkRepo() {
 
   for (const pr of prs) {
     console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
+
     const branchName = `upstream-pr-${pr.number}`;
     const patchFileName = path.join(repoPath, branchName+".patch");
     console.log("[PRMERGE] Fetching everything...");
@@ -187,6 +189,7 @@ export async function checkRepo() {
     await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
+      console.log(`[PRMERGE] Applying patch for PR #${pr.number}...`);
       await git.raw("apply", "--3way", "--binary", "--apply", patchFileName, log)
     } catch (e: any) {
 
@@ -205,7 +208,7 @@ export async function checkRepo() {
         scssc++;
       }
 
-      if (fails > successes || !fails || !successes) {
+      if (fails > successes || !successes) {
         await git.reset(ResetMode.HARD, log);
         console.error("Patch couldn't be applied!\n\n", e);
         console.error(`(Fails: ${fails}) > (Successes: ${successes})`);
