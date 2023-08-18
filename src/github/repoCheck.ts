@@ -187,8 +187,7 @@ export async function checkRepo() {
     await fs.writeFile(patchFileName, patch.data as string, "utf-8");
 
     try {
-      console.log(`[PRMERGE] Applying patch for PR #${pr.number}...`);
-      await git.applyPatch(patchFileName, ["--3way"], log);
+      await git.raw("apply", "--3way", "--binary", "--apply", patchFileName, log)
     } catch (e: any) {
 
       console.log(`[PRMERGE] Counting fails and successes...`);
