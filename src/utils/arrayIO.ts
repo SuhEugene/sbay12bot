@@ -20,7 +20,7 @@ export class ArrayIO<T> {
     }
 
     try { this._data = JSON.parse(reportsString); }
-    catch (e) { console.error("CANNOT PARSE", e); }
+    catch (e) { console.error("CANNOT PARSE", this.filePath, e); }
 
     return this._data;
   }
