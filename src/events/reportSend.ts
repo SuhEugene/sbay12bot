@@ -58,7 +58,7 @@ export class ReportSend {
       issue = await shared.octokit?.issues.create({
         owner, repo, body,
         title: `${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`,
-        milestone: process.env["REPORT_MILESTONE"] || null,
+        milestone: process.env["REPORT_MILESTONE"],
         labels: [reportLabels[session.type]]
       });
     } catch (e) {
