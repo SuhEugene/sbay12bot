@@ -9,14 +9,16 @@
     "build": "tsc",
     "build:changelog": "npx @discordx/changelog --src src",
     "dev": "ts-node-esm src/main.ts",
-    "start": "node build/main.js",
-    "watch": "nodemon --exec ts-node-esm src/main.ts"
+    "start": "cross-env NODE_ENV=production node build/main.js",
+    "watch": "nodemon --exec ts-node-esm src/main.ts",
+    "pbr": "git pull; yarn build; pm2 reload sbay"
   },
   "dependencies": {
     "@discordx/importer": "^1.2.2",
     "@discordx/pagination": "^3.4.1",
     "@octokit/rest": "^20.0.1",
     "@octokit/webhooks": "^12.0.3",
+    "cross-env": "^7.0.3",
     "discord.js": "^14.11.0",
     "discordx": "^11.7.6",
     "dotenv": "^16.3.1",
