@@ -155,127 +155,132 @@ export async function checkRepo() {
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
 
   for (const pr of prs) {
-    console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
-
-    const branchName = `upstream-pr-${pr.number}`;
-    const patchFileName = path.join(repoPath, branchName+".patch");
-    console.log("[PRMERGE] Fetching everything...");
-    await git.fetch("", ["--all"], log);
-
-    console.log(`[PRMERGE] Resetting everythong...`);
-    await git.reset(ResetMode.HARD, log);
-    await git.clean(CleanOptions.FORCE + CleanOptions.RECURSIVE, log);
-
-    console.log("[PRMERGE] Checking out dev-sierra...")
-    await git.checkout("dev-sierra");
-    
-    console.log("[PRMERGE] Pulling origin dev-sierra...")
-    await git.pull("origin", "dev-sierra");
-    try {
-      console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra...`);
-      await git.checkoutBranch(branchName, "dev-sierra");
-    } catch (e) {
-      console.log(`[PRMERGE] Deleting branch ${branchName}...`);
-      await git.deleteLocalBranch(branchName, true);
-
-      console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra again...`);
-      await git.checkoutBranch(branchName, "dev-sierra");
-    }
-
-    console.log(`[PRMERGE] Requesting patch for PR #${pr.number}...`);
-    const patch = await octo.request(pr.patch_url);
-
-    console.log(`[PRMERGE] Writing patch for PR #${pr.number}...`);
-    await fs.writeFile(patchFileName, patch.data as string, "utf-8");
-
-    try {
-      console.log(`[PRMERGE] Applying patch for PR #${pr.number}...`);
-      await git.raw("apply", "--3way", "--binary", "--apply", patchFileName, log)
-    } catch (e: any) {
-
-      console.log(`[PRMERGE] Counting fails and successes...`);
-      const fails = 0
-        + (e.message as string).split("error: patch failed").length-1
-        + (e.message as string).split("error: the patch applies to").length-1;
-      const successes = (e.message as string).split("Applied patch to").length-1;
-
-      let scssc = 0; // additional successes for binaries;
-      const test = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
-      for (const el of test) {
-        const path = el[1].trim();
-        console.log(`[PRMERGE] Checking out theirs binary ${path}...`);
-        await git.checkout(path, ["--theirs"]);
-        scssc++;
-      }
-
-      if (fails > successes || !successes) {
-        await git.reset(ResetMode.HARD, log);
-        console.error("Patch couldn't be applied!\n\n", e);
-        console.error(`(Fails: ${fails}) > (Successes: ${successes})`);
-        return;
-      }
-    }
-    console.log(`[PRMERGE] Deleting patch file...`);
-    await fs.unlink(patchFileName);
-
-    console.log(`[PRMERGE] Adding everything to commit...`);
-    await git.add(".");
-    if (pr.user) {
-      console.log(`[PRMERGE] Commiting with author...`);
-      const u = pr.user;
-      await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, "--author", `${u.name||u.login} <${u.id}+${u.login}@users.noreply.github.com>`, log);
-    } else {
-      console.log(`[PRMERGE] Commiting without author...`);
-      await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, log);
-    }
-    try {
-      console.log(`[PRMERGE] Pushing to origin/${branchName}...`);
-      await git.push("origin", branchName, undefined, log);
-    } catch (e) {
-      console.log(`[PRMERGE] Force pushing to origin/${branchName}...`);
-      console.error("CANNOT PUSH, FORCING!!!", e);
-      await git.raw(["push", "origin", branchName, "--force"], log);
-    }
-    let myPr;
-    try {
-      console.log(`[PRMERGE] Creating pull request...`);
-      try {
-        myPr = (await octo.pulls.create({
-          owner, repo, head: branchName, base: "dev-sierra",
-          title: `[MIRROR] ${pr.title}`,
-          body:
-            `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
-            checkForCl(pr.body || '', pr.user?.login)
-        })).data;
-      } catch (e: any) {
-        if (!e.message.includes("A pull request already exists")) {
-          console.error("FATAL FATAL FATAL FATAL FATAL");
-          console.error(e);
-          process.exit(0);
-        } else {
-          myPr = (await octo.pulls.list({
-            owner, repo, head: branchName, base: "dev-sierra"
-          })).data[0];
-        }
-      }
-
-      /////////////////////////////////
-      try {
-        await shared.octokit?.issues.addLabels({
-          owner, repo, issue_number: myPr.number,
-          labels: [ githubLabels[GithubLabel.Mirror] ]
-        });
-      } catch (e) {console.error("Epic fail", e);}
-      /////////////////////////////////
-      
-      // await sendToMirrorDiscord(myPr);
-    } catch (e: any) {
-      const re = e as RequestError;
-      if (!re.message.includes("pull request already exists"))
-        throw e;
-    }
+    await mergePr(octo, owner, repo, pr);
     console.log(`[PRMERGE] Writing since date...`);
     await writeSinceDate(new Date(pr.updated_at));
   }
   console.log("Check successful!")
+}
+
+
+export async function mergePr(octo: Octokit, owner: string, repo: string, pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
+  console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
+
+  const branchName = `upstream-pr-${pr.number}`;
+  const patchFileName = path.join(repoPath, branchName+".patch");
+  console.log("[PRMERGE] Fetching everything...");
+  await git.fetch("", ["--all"], log);
+
+  console.log(`[PRMERGE] Resetting everythong...`);
+  await git.reset(ResetMode.HARD, log);
+  await git.clean(CleanOptions.FORCE + CleanOptions.RECURSIVE, log);
+
+  console.log("[PRMERGE] Checking out dev-sierra...")
+  await git.checkout("dev-sierra");
+  
+  console.log("[PRMERGE] Pulling origin dev-sierra...")
+  await git.pull("origin", "dev-sierra");
+  try {
+    console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra...`);
+    await git.checkoutBranch(branchName, "dev-sierra");
+  } catch (e) {
+    console.log(`[PRMERGE] Deleting branch ${branchName}...`);
+    await git.deleteLocalBranch(branchName, true);
+
+    console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra again...`);
+    await git.checkoutBranch(branchName, "dev-sierra");
+  }
+
+  console.log(`[PRMERGE] Requesting patch for PR #${pr.number}...`);
+  const patch = await octo.request(pr.patch_url);
+
+  console.log(`[PRMERGE] Writing patch for PR #${pr.number}...`);
+  await fs.writeFile(patchFileName, patch.data as string, "utf-8");
+
+  try {
+    console.log(`[PRMERGE] Applying patch for PR #${pr.number}...`);
+    await git.raw("apply", "--3way", "--binary", "--apply", patchFileName, log)
+  } catch (e: any) {
+
+    console.log(`[PRMERGE] Counting fails and successes...`);
+    const fails = 0
+      + (e.message as string).split("error: patch failed").length-1
+      + (e.message as string).split("error: the patch applies to").length-1;
+    const successes = (e.message as string).split("Applied patch to").length-1;
+
+    let scssc = 0; // additional successes for binaries;
+    const test = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
+    for (const el of test) {
+      const path = el[1].trim();
+      console.log(`[PRMERGE] Checking out theirs binary ${path}...`);
+      await git.checkout(path, ["--theirs"]);
+      scssc++;
+    }
+
+    if (fails > successes || !successes) {
+      await git.reset(ResetMode.HARD, log);
+      console.error("Patch couldn't be applied!\n\n", e);
+      console.error(`(Fails: ${fails}) > (Successes: ${successes})`);
+      return;
+    }
+  }
+  console.log(`[PRMERGE] Deleting patch file...`);
+  await fs.unlink(patchFileName);
+
+  console.log(`[PRMERGE] Adding everything to commit...`);
+  await git.add(".");
+  if (pr.user) {
+    console.log(`[PRMERGE] Commiting with author...`);
+    const u = pr.user;
+    await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, "--author", `${u.name||u.login} <${u.id}+${u.login}@users.noreply.github.com>`, log);
+  } else {
+    console.log(`[PRMERGE] Commiting without author...`);
+    await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, log);
+  }
+  try {
+    console.log(`[PRMERGE] Pushing to origin/${branchName}...`);
+    await git.push("origin", branchName, undefined, log);
+  } catch (e) {
+    console.log(`[PRMERGE] Force pushing to origin/${branchName}...`);
+    console.error("CANNOT PUSH, FORCING!!!", e);
+    await git.raw(["push", "origin", branchName, "--force"], log);
+  }
+  let myPr;
+  try {
+    console.log(`[PRMERGE] Creating pull request...`);
+    try {
+      myPr = (await octo.pulls.create({
+        owner, repo, head: branchName, base: "dev-sierra",
+        title: `[MIRROR] ${pr.title}`,
+        body:
+          `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
+          checkForCl(pr.body || '', pr.user?.login)
+      })).data;
+    } catch (e: any) {
+      if (!e.message.includes("A pull request already exists")) {
+        console.error("FATAL FATAL FATAL FATAL FATAL");
+        console.error(e);
+        process.exit(0);
+      } else {
+        myPr = (await octo.pulls.list({
+          owner, repo, head: branchName, base: "dev-sierra"
+        })).data[0];
+      }
+    }
+
+    /////////////////////////////////
+    try {
+      await shared.octokit?.issues.addLabels({
+        owner, repo, issue_number: myPr.number,
+        labels: [ githubLabels[GithubLabel.Mirror] ]
+      });
+    } catch (e) {console.error("Epic fail", e);}
+    /////////////////////////////////
+    
+    // await sendToMirrorDiscord(myPr);
+  } catch (e: any) {
+    const re = e as RequestError;
+    if (!re.message.includes("pull request already exists"))
+      throw e;
+  }
 }
