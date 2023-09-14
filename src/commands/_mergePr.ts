@@ -27,7 +27,18 @@ export class MergeCommand {
     if (!octo) return;
     
     const [ owner, repo ] = process.env["GET_REPO"].split("/");
-    const pr = await octo.pulls.get({ owner, repo, pull_number: prNumber });
+
+    let pr;
+    try {
+      pr = await octo.pulls.get({ owner, repo, pull_number: prNumber });
+    } catch (e) {
+      if (e instanceof Error)
+        command.message.reply(`Невозможно найти PR:\`\`\`\n${e.message}\n\`\`\``);
+    }
+
+    if (!pr) return;
+
+    command.message.react("<a:MYAA:1151536020194594907>");
 
     const [ realOwner, realRepo ] = process.env["REPORT_REPO"].split("/");
 
