@@ -277,6 +277,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
     } catch (e) {console.error("Epic fail", e);}
     /////////////////////////////////
     
+    return myPr;
     // await sendToMirrorDiscord(myPr);
   } catch (e: any) {
     const re = e as RequestError;

@@ -1,12 +1,11 @@
 import { NotBot } from "@discordx/utilities";
 import { CommandInteraction } from "discord.js";
 import { Discord, Guard, SimpleCommand, SimpleCommandMessage } from "discordx";
-import { CommandWithFields } from "../commandWithFields.js";
 import { HasMinionRole } from "../guards/hasMinionRole.js";
 
 @Discord()
 @Guard(NotBot, HasMinionRole)
-export class PingCommand extends CommandWithFields {
+export class PingCommand {
 
   @SimpleCommand({ name: "ping" })
   async ping(command: SimpleCommandMessage) {
