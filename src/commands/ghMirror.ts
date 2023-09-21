@@ -4,7 +4,7 @@ import { mirrorAccept } from "../utils/mirrorTools.js";
 
 @Discord()
 export class GHMirror {
-  @SimpleCommand({ name: "mac", argSplitter: " " })
+  @SimpleCommand({ name: "mac" })
   async ghMirrorAccept(
     command: SimpleCommandMessage
   ) {

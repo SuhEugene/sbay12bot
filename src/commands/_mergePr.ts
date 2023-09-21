@@ -8,7 +8,7 @@ import { RestEndpointMethodTypes } from "@octokit/rest";
 @Guard(NotBot)
 export class MergeCommand {
 
-  @SimpleCommand({ name: "merge", argSplitter: " " })
+  @SimpleCommand({ name: "merge" })
   async ping(
     @SimpleCommandOption({ name: "prNumber", type: SimpleCommandOptionType.Number })
     prNumber: number | undefined,

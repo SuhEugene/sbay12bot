@@ -3,7 +3,7 @@ import { Discord, SimpleCommand, SimpleCommandMessage } from "discordx";
 import { bot } from "../main.js"
 @Discord()
 export class RemoveMsg {
-  @SimpleCommand({ name: "rmall", argSplitter: " " })
+  @SimpleCommand({ name: "rmall" })
   async rmmsg(
     command: SimpleCommandMessage
   ) {

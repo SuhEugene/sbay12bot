@@ -3,7 +3,7 @@ import { Discord, SimpleCommand, SimpleCommandMessage, SimpleCommandOption, Simp
 
 @Discord()
 export class RemoveMsg {
-  @SimpleCommand({ name: "rm", argSplitter: " " })
+  @SimpleCommand({ name: "rm" })
   async rmmsg(
     @SimpleCommandOption({ name: "msg", type: SimpleCommandOptionType.String })
     msgId: string | undefined,

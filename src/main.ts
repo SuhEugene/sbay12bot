@@ -35,6 +35,7 @@ export const bot = new Client({
   // Configuration for @SimpleCommand
   simpleCommand: {
     prefix: "sb-",
+    argSplitter: / +/
   },
 });
 
