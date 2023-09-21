@@ -108,21 +108,6 @@ bot.on("interactionCreate", (interaction: Interaction) => {
   bot.executeInteraction(interaction);
 });
 
-bot.on("messageCreate", async (message: Message) => {
-  if (message.channelId == "1113779558844469269") {
-    const maeko = await bot.users.fetch("258962443441537024");
-    // const maeko = await bot.users.fetch("706124306660458507");
-    const msgtext = message.content.slice(0, 1700);
-    const msgauthor = `<@!${message.author.id}> (${(message.author.discriminator != "0") ? (message.author.username+'#'+message.author.discriminator) : ('@'+message.author.username)})`;
-    await maeko.send({
-      content: `### WIKI-MISTAKE\nАвтор: ${msgauthor}\nСсылка: ${message.url}\n=====\n${msgtext}${message.content.length > 1700 ? ' \\[...\\]' : ''}`
-    });
-    console.log(`>> SENT ${message.id} TO MAEKO!`);
-    return;
-  }
-  bot.executeCommand(message);
-});
-
 async function run() {
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
