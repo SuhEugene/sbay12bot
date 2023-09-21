@@ -18,7 +18,7 @@ export const webhooks = new Webhooks({
 
 export const bot = new Client({
   // To use only guild command
-  botGuilds: [process.env["REPORT_GUILD"] as string, "946712507874152488"],
+  botGuilds: process.env["REPORT_GUILD"] ? [process.env["REPORT_GUILD"] as string, "946712507874152488"] : ["946712507874152488"],
 
   // Discord intents
   intents: [
