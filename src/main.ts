@@ -109,6 +109,10 @@ bot.on("interactionCreate", (interaction: Interaction) => {
   bot.executeInteraction(interaction);
 });
 
+bot.on("messageCreate", (message) => {
+  bot.executeCommand(message);
+})
+
 async function run() {
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
