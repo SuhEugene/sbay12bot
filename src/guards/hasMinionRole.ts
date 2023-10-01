@@ -34,7 +34,7 @@ export const HasMinionRole: GuardFunction<CommandInteraction> = async (arg, clie
   const sep = "\n- ";
   if (!hasAnyRole)
     return await replyToInteraction(interaction, {
-      content: `Репорт может сделать только обладатель одной из ролей:${sep}${roles.map(toRole).join(sep)}`,
+      content: `Данный вид репорта может сделать только обладатель одной из ролей:${sep}${roles.map(toRole).join(sep)}`,
       ephemeral: true,
       allowedMentions: { parse: [] }
     });
