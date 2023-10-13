@@ -162,7 +162,7 @@ export async function checkRepo() {
   console.log("Check successful!")
 }
 
-
+const ERROR_SKIPLIST: string[] = [];
 export async function mergePr(octo: Octokit, owner: string, repo: string, pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
   console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
 
@@ -258,9 +258,30 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
       })).data;
     } catch (e: any) {
       if (!e.message.includes("A pull request already exists")) {
+        const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
+        const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
+        if (e.message) {
+          if (e.message.includes("No commits between")) {
+            await channel.send(
+              '<@!706124306660458507>\n'+
+              `Изменения [Pull Request #${pr.number}](${pr.html_url}) полностью совпадают с текущей активной веткой.`+
+              '\nPR проигнорирован и требует ручной проверки.'
+            );
+            return;
+          }
+          await channel.send(
+            '<@!706124306660458507>\n'+
+            'Копирование [Pull Request #${pr.number}](${pr.html_url}) невозможно.\n'+
+            'Ошибка:\n```\n'+e.message+'\n```'
+          );
+        }
         console.error("FATAL FATAL FATAL FATAL FATAL");
         console.error(e);
-        process.exit(0);
+        if (e.message)
+          for (const errMsg of ERROR_SKIPLIST)
+            if (e.message.includes(errMsg))
+              return;
+        process.exit(14);
       } else {
         myPr = (await octo.pulls.list({
           owner, repo, head: branchName, base: "dev-sierra"
