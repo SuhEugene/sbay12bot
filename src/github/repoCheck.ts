@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { EMBED_COLOR_DEFAULT, EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
+import { EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
@@ -7,12 +7,15 @@ import simpleGit, { CleanOptions, ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
+import fetch from "node-fetch";
 
 const filePath = path.join(cwd(), "src", "data", "lastFetch.txt");
 const repoPath = path.join(cwd(), "repo");
 const git = simpleGit(repoPath);
 
-
+function customFetch(url: string, options: Record<string, string>) {
+  return fetch(url, options);
+}
 
 async function getSinceDate() {
   let sinceDate = new Date(1691154218000);
@@ -155,7 +158,13 @@ export async function checkRepo() {
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
 
   for (const pr of prs) {
-    await mergePr(octo, owner, repo, pr);
+    try {
+      await mergePr(octo, owner, repo, pr);
+    } catch (e: any) {
+      console.error("Check failed!");
+      console.error(e);
+      return;
+    }
     console.log(`[PRMERGE] Writing since date...`);
     await writeSinceDate(new Date(pr.updated_at));
   }
@@ -192,7 +201,20 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
   }
 
   console.log(`[PRMERGE] Requesting patch for PR #${pr.number}...`);
-  const patch = await octo.request(pr.patch_url);
+  const patch = await octo.request(pr.patch_url, {
+    request: { fetch: customFetch }
+  }).catch(async (e: any) => {
+    const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
+    const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
+    await channel.send(
+      '<@!706124306660458507>\n'+
+      `Копирование [Pull Request #${pr.number}](<${pr.html_url}>) невозможно.\n`+
+      'Ошибка:\n```\n'+e.message+'\n```'
+    );
+    process.exit(14);
+  });
+  if (!patch)
+    throw new Error("Патч отсутствует");
 
   console.log(`[PRMERGE] Writing patch for PR #${pr.number}...`);
   await fs.writeFile(patchFileName, patch.data as string, "utf-8");
