@@ -271,7 +271,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
           }
           await channel.send(
             '<@!706124306660458507>\n'+
-            'Копирование [Pull Request #${pr.number}](${pr.html_url}) невозможно.\n'+
+            `Копирование [Pull Request #${pr.number}](${pr.html_url}) невозможно.\n`+
             'Ошибка:\n```\n'+e.message+'\n```'
           );
         }
