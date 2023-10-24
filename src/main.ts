@@ -9,6 +9,7 @@ import { readReports } from "./utils/githubReports.js";
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 import { createServer } from "http";
 import { checkRepo } from "./github/repoCheck.js";
+import path, { normalize } from "path";
 
 config();
 
@@ -101,8 +102,8 @@ bot.once("ready", async () => {
 
   console.log("=============");
 
-  setInterval(checkRepo, 5*MINUTES);
-  checkRepo();
+  // setInterval(checkRepo, 5*MINUTES);
+  // checkRepo();
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {
@@ -110,6 +111,8 @@ bot.on("interactionCreate", (interaction: Interaction) => {
 });
 
 bot.on("messageCreate", (message) => {
+  if (message.channel.id === '903343634412359691')
+    try { message.react("<:PepeList:772558440803336192>"); } catch (e) {}
   bot.executeCommand(message);
 })
 
