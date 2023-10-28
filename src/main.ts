@@ -119,36 +119,13 @@ bot.on("messageCreate", (message) => {
 async function run() {
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
-  // Let's start the bot
-  if (!process.env["BOT_TOKEN"])
-    throw Error("Could not find BOT_TOKEN in your environment");
-  
-  if (!process.env["GIT_TOKEN"])
-    throw Error("Could not find GIT_TOKEN in your environment");
-
-  if (!process.env["REPORT_GUILD"])
-    throw Error("Could not find REPORT_GUILD in your environment")
-
-  if (!process.env["REPORT_CHANNEL"])
-    throw Error("Could not find REPORT_CHANNEL in your environment")
-
-  if (!process.env["MIRROR_CHANNEL"])
-    throw Error("Could not find MIRROR_CHANNEL in your environment")
-    
-  if (!process.env["REPORT_REPO"])
-    throw Error("Could not find REPORT_REPO in your environment")
-  
-  if (!process.env["GET_REPO"])
-    throw Error("Could not find GET_REPO in your environment")
-
-  if (!process.env["ALLOWED_ROLES"])
-    throw Error("Could not find ALLOWED_ROLES in your environment")
-
-  if (!process.env["GIT_EMAIL"])
-    throw Error("Could not find GIT_EMAIL in your environment")
-  
-  if (!process.env["GIT_NAME"])
-    throw Error("Could not find GIT_NAME in your environment")
+  const envsToCheck = [
+    "BOT_TOKEN", "GIT_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
+    "MIRROR_CHANNEL", "REPORT_REPO", "GET_REPO", "ALLOWED_ROLES",
+    "GIT_EMAIL", "GIT_NAME"] as const;
+  for (const env of envsToCheck)
+    if (!process.env[env])
+      throw Error(`Could not find ${env} in your environment`);
 
   shared.octokit = new Octokit({
     auth: process.env["GIT_TOKEN"]
