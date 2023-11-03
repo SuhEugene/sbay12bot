@@ -102,8 +102,8 @@ bot.once("ready", async () => {
 
   console.log("=============");
 
-  // setInterval(checkRepo, 5*MINUTES);
-  // checkRepo();
+  setInterval(checkRepo, 5*MINUTES);
+  checkRepo();
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {
@@ -138,7 +138,7 @@ async function run() {
   await import(`${dirname(import.meta.url)}/github/catcher.js`)
 
   // Create webhook server
-  createServer(createNodeMiddleware(webhooks, { path: "/" })).listen(process.env["PORT"] || 51528);
+  createServer(createNodeMiddleware(webhooks, { path: "/" })).listen(process.env["PORT"] || 51528, "0.0..0", () => console.log("Listening port", process.env["PORT"] || 51528));
 }
 
 run();
