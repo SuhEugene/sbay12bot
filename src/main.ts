@@ -132,7 +132,7 @@ async function run() {
   });
 
   // Log in with your bot token
-  await bot.login(process.env["BOT_TOKEN"]);
+  await bot.login(process.env["BOT_TOKEN"] as string);
 
   // Import github hooks
   await import(`${dirname(import.meta.url)}/github/catcher.js`)
