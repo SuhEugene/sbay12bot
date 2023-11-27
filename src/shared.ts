@@ -5,7 +5,7 @@ import { cwd } from "process";
 import path from "path";
 
 export enum ReportType {
-  Bug, Mechanics, Object, Sprite, Request, Map, Sound
+  Bug, Mechanics, Object, Sprite, Request, Map, Sound, Loadout
 }
 export enum ReportFieldId {
   Ckey = "r-ckey",
@@ -116,7 +116,8 @@ export enum ModalId {
   ReportSprite = "modal-report-sprite",
   ReportRequest = "modal-report-request",
   ReportMap = "modal-report-map",
-  ReportSound = "modal-report-sound"
+  ReportSound = "modal-report-sound",
+  ReportLoadout = "modal-report-loadout"
 }
 
 export const reportTypeToModalId = {
@@ -126,7 +127,8 @@ export const reportTypeToModalId = {
   [ReportType.Mechanics]: ModalId.ReportMech,
   [ReportType.Request]:   ModalId.ReportRequest,
   [ReportType.Map]:       ModalId.ReportMap,
-  [ReportType.Sound]:     ModalId.ReportSound
+  [ReportType.Sound]:     ModalId.ReportSound,
+  [ReportType.Loadout]:   ModalId.ReportLoadout
 }
 
 export const reportTitlePrefixes = {
@@ -136,7 +138,8 @@ export const reportTitlePrefixes = {
   [ReportType.Sprite]: "Старый спрайт",
   [ReportType.Request]: "Запрос",
   [ReportType.Map]: "Карта",
-  [ReportType.Sound]: "Звук"
+  [ReportType.Sound]: "Звук",
+  [ReportType.Loadout]: "Лодаут"
 }
 
 export const reportTitleSuffixes = {
@@ -146,7 +149,8 @@ export const reportTitleSuffixes = {
   [ReportType.Sprite]: "Спрайт-репорт",
   [ReportType.Request]: "Запрос",
   [ReportType.Map]: "Карта-репорт",
-  [ReportType.Sound]: "Звук-репорт"
+  [ReportType.Sound]: "Звук-репорт",
+  [ReportType.Loadout]: "Лодаут-репорт"
 }
 
 export const reportLabels = {
@@ -156,7 +160,8 @@ export const reportLabels = {
   [ReportType.Sprite]: ":lady_beetle: Старый спрайт",
   [ReportType.Request]: ":hand: Запрос",
   [ReportType.Map]: ":world_map: Карты",
-  [ReportType.Sound]: ":sound: Звуки"
+  [ReportType.Sound]: ":sound: Звуки",
+  [ReportType.Loadout]: ":school_satchel: Лодаут"
 }
 
 export enum GithubLabel {
