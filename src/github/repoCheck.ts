@@ -306,7 +306,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
         process.exit(14);
       } else {
         myPr = (await octo.pulls.list({
-          owner, repo, head: branchName, base: "dev-sierra"
+          owner, repo, head: `${owner}:branchName`, base: "dev-sierra"
         })).data[0];
       }
     }
