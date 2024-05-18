@@ -8,8 +8,7 @@ config();
 async function run() {
 
   const envsToCheck = [
-    "GITHUB_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
-    "MIRROR_CHANNEL", "REPORT_REPO", "GET_REPO", "ALLOWED_ROLES",
+    "GITHUB_TOKEN", "REPORT_REPO", "GET_REPO",
     "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME"] as const;
   for (const env of envsToCheck)
     if (!process.env[env])
