@@ -5,7 +5,6 @@ import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { CleanOptions, ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
-import { bot } from "../main.js";
 import fetch from "node-fetch";
 
 const filePath = path.join(cwd(), "src", "data", "lastFetch.txt");
@@ -168,7 +167,6 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
   const patch = await octo.request(pr.patch_url, {
     request: { fetch: customFetch }
   }).catch(async (e: any) => {
-    const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
     console.error(
       `Копирование [Pull Request #${pr.number}](<${pr.html_url}>) невозможно.\n`+
       'Ошибка:\n'+e.message+''
@@ -242,7 +240,6 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
       })).data;
     } catch (e: any) {
       if (!e.message.includes("A pull request already exists")) {
-        const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
         if (e.message) {
           if (e.message.includes("No commits between")) {
             console.error(
