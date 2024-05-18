@@ -94,15 +94,15 @@ export async function checkRepo() {
     throw Error("Could not find GET_REPO in your environment")
   if (!process.env["BASE_BRANCH"])
     throw Error("Could not find BASE_BRANCH in your environment")
-  if (!process.env["REPORT_REPO"])
-    throw Error("Could not find REPORT_REPO in your environment")
+  if (!process.env["BASE_REPO"])
+    throw Error("Could not find BASE_REPO in your environment")
   if (!process.env["GIT_EMAIL"])
     throw Error("Could not find GIT_EMAIL in your environment")
   if (!process.env["GIT_NAME"])
     throw Error("Could not find GIT_NAME in your environment")
 
   const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
-  const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
+  const [ owner, repo ] = process.env["BASE_REPO"].split("/");
 
   const sinceDate = await getSinceDate();
   console.log("Checking repo "+process.env["GET_REPO"]);
