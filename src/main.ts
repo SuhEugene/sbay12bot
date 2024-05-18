@@ -8,7 +8,7 @@ config();
 async function run() {
 
   const envsToCheck = [
-    "BOT_TOKEN", "GIT_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
+    "GITHUB_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
     "MIRROR_CHANNEL", "REPORT_REPO", "GET_REPO", "ALLOWED_ROLES",
     "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME"] as const;
   for (const env of envsToCheck)
@@ -16,7 +16,7 @@ async function run() {
       throw Error(`Could not find ${env} in your environment`);
 
   shared.octokit = new Octokit({
-    auth: process.env["GIT_TOKEN"]
+    auth: process.env["GITHUB_TOKEN"]
   });
 
   const mstone = process.env["REPORT_MILESTONE"];
