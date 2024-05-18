@@ -106,16 +106,6 @@ bot.once("ready", async () => {
   checkRepo();
 });
 
-bot.on("interactionCreate", (interaction: Interaction) => {
-  bot.executeInteraction(interaction);
-});
-
-bot.on("messageCreate", (message) => {
-  if (message.channel.id === '903343634412359691')
-    try { message.react("<:PepeList:772558440803336192>"); } catch (e) {}
-  bot.executeCommand(message);
-})
-
 async function run() {
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 

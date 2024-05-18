@@ -1,11 +1,10 @@
 import { promises as fs } from "fs";
-import { EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabels, mirrorPRs, shared } from "../shared.js";
+import { GithubLabel, githubLabels, shared } from "../shared.js";
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { CleanOptions, ResetMode } from "simple-git";
 import { RequestError } from "@octokit/request-error";
-import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
 import fetch from "node-fetch";
 
@@ -72,43 +71,6 @@ type PRData = {
   html_url: string,
   number: number
 };
-
-async function sendToMirrorDiscord(pr: PRData) {
-  const embed = new EmbedBuilder()
-    .setTitle(
-      pr.title.length > 100
-      ? pr.title.substring(0, 97) + "..."
-      : pr.title
-    )
-    .setDescription(
-      pr.body
-      ? (
-        pr.body.length > 1000
-        ? pr.body.substring(0, 997) + "..."
-        : pr.body
-      )
-      : "No description provided"
-    )
-    .setColor(EMBED_COLOR_WARNING)
-    .setURL(pr.html_url);
-
-  const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
-  const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
-
-  const githubButton = new ButtonBuilder()
-    .setStyle(ButtonStyle.Link)
-    .setURL(pr.html_url)
-    .setLabel(`GitHub PR #${pr.number}`);
-
-  const row = getAcceptOrVoteMirrorRow(githubButton);
-
-  const msg = await channel.send({
-    embeds: [ embed ],
-    components: [ row ]
-  });
-
-  await mirrorPRs.push({ pr_number: pr.number, message: msg.id });
-}
 
 function checkForCl(body = '', username = '') {
   if (!body || !username) return body;
@@ -281,20 +243,17 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
     } catch (e: any) {
       if (!e.message.includes("A pull request already exists")) {
         const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
-        const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
         if (e.message) {
           if (e.message.includes("No commits between")) {
-            await channel.send(
-              '<@!706124306660458507>\n'+
+            console.error(
               `Изменения [Pull Request #${pr.number}](<${pr.html_url}>) полностью совпадают с текущей активной веткой.`+
               '\nPR проигнорирован и требует ручной проверки.'
             );
             return;
           }
-          await channel.send(
-            '<@!706124306660458507>\n'+
+          console.error(
             `Копирование [Pull Request #${pr.number}](<${pr.html_url}>) невозможно.\n`+
-            'Ошибка:\n```\n'+e.message+'\n```'
+            'Ошибка:\n'+e.message+'\n'
           );
         }
         console.error("FATAL FATAL FATAL FATAL FATAL");
