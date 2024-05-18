@@ -135,7 +135,7 @@ async function run() {
   await bot.login(process.env["BOT_TOKEN"] as string);
 
   // Import github hooks
-  await import(`${dirname(import.meta.url)}/github/catcher.js`)
+  await import('file://'+path.join(dirname(import.meta.url), '/github/catcher.ts'))
 
   // Create webhook server
   createServer(createNodeMiddleware(webhooks, { path: "/" })).listen(Number(process.env["PORT"] || 51528), "0.0.0.0", () => console.log("Listening port", process.env["PORT"] || 51528));
