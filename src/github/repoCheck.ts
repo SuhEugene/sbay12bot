@@ -131,6 +131,8 @@ export async function checkRepo() {
 
   if (!process.env["GET_REPO"])
     throw Error("Could not find GET_REPO in your environment")
+  if (!process.env["BASE_BRANCH"])
+    throw Error("Could not find BASE_BRANCH in your environment")
   if (!process.env["REPORT_REPO"])
     throw Error("Could not find REPORT_REPO in your environment")
   if (!process.env["GIT_EMAIL"])
@@ -140,7 +142,7 @@ export async function checkRepo() {
 
   const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
   const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
-  
+
   const sinceDate = await getSinceDate();
   console.log("Checking repo "+process.env["GET_REPO"]);
   console.log("Since:", sinceDate);
@@ -159,7 +161,7 @@ export async function checkRepo() {
 
   for (const pr of prs) {
     try {
-      await mergePr(octo, owner, repo, pr);
+      await mergePr(octo, owner, repo, process.env["BASE_BRANCH"], pr);
     } catch (e: any) {
       console.error("Check failed!");
       console.error(e);
@@ -172,7 +174,7 @@ export async function checkRepo() {
 }
 
 const ERROR_SKIPLIST: string[] = [];
-export async function mergePr(octo: Octokit, owner: string, repo: string, pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
+export async function mergePr(octo: Octokit, owner: string, repo: string, baseBranch: string, pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
   console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
 
   const branchName = `upstream-pr-${pr.number}`;
@@ -180,24 +182,24 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
   console.log("[PRMERGE] Fetching everything...");
   await git.fetch("", ["--all"], log);
 
-  console.log(`[PRMERGE] Resetting everythong...`);
+  console.log(`[PRMERGE] Resetting everything...`);
   await git.reset(ResetMode.HARD, log);
   await git.clean(CleanOptions.FORCE + CleanOptions.RECURSIVE, log);
 
-  console.log("[PRMERGE] Checking out dev-sierra...")
-  await git.checkout("dev-sierra");
+  console.log(`[PRMERGE] Checking out ${baseBranch}...`)
+  await git.checkout(baseBranch);
   
-  console.log("[PRMERGE] Pulling origin dev-sierra...")
-  await git.pull("origin", "dev-sierra");
+  console.log(`[PRMERGE] Pulling origin ${baseBranch}...`)
+  await git.pull("origin", baseBranch);
   try {
-    console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra...`);
-    await git.checkoutBranch(branchName, "dev-sierra");
+    console.log(`[PRMERGE] Checking out ${branchName} from ${baseBranch}...`);
+    await git.checkoutBranch(branchName, baseBranch);
   } catch (e) {
     console.log(`[PRMERGE] Deleting branch ${branchName}...`);
     await git.deleteLocalBranch(branchName, true);
 
-    console.log(`[PRMERGE] Checking out ${branchName} from dev-sierra again...`);
-    await git.checkoutBranch(branchName, "dev-sierra");
+    console.log(`[PRMERGE] Checking out ${branchName} from ${baseBranch} again...`);
+    await git.checkoutBranch(branchName, baseBranch);
   }
 
   console.log(`[PRMERGE] Requesting patch for PR #${pr.number}...`);
@@ -272,7 +274,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
     console.log(`[PRMERGE] Creating pull request...`);
     try {
       myPr = (await octo.pulls.create({
-        owner, repo, head: branchName, base: "dev-sierra",
+        owner, repo, head: branchName, base: baseBranch,
         title: `[MIRROR] ${pr.title}`,
         body:
           `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
@@ -306,7 +308,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, pr: Re
         process.exit(14);
       } else {
         myPr = (await octo.pulls.list({
-          owner, repo, head: branchName, base: "dev-sierra"
+          owner, repo, head: branchName, base: baseBranch
         })).data[0];
       }
     }

@@ -89,7 +89,7 @@ bot.once("ready", async () => {
   console.log(` Logged in as:   ${bot.user.tag} [${bot.user.id}]`);
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
   console.log(` Report channel: #${reportChannel.name} [${reportChannel.id}]`);
-  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}${mstone && (', Milestone: '+ mstone)}`);
+  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}:${process.env["BASE_BRANCH"]}${mstone && (', Milestone: '+ mstone)}`);
   console.log(` Fetch GitHub:   ${process.env["GET_REPO"]}`);
 
   console.log(` Allowed roles:`);
@@ -122,7 +122,7 @@ async function run() {
   const envsToCheck = [
     "BOT_TOKEN", "GIT_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
     "MIRROR_CHANNEL", "REPORT_REPO", "GET_REPO", "ALLOWED_ROLES",
-    "GIT_EMAIL", "GIT_NAME"] as const;
+    "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME"] as const;
   for (const env of envsToCheck)
     if (!process.env[env])
       throw Error(`Could not find ${env} in your environment`);
