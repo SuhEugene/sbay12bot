@@ -3,10 +3,7 @@ import { Octokit } from "@octokit/rest";
 type sharedType = { octokit: Octokit | null }
 export const shared: sharedType = { octokit: null }
 
-export const githubBodyFooter = "\n<hr>\n\n*Репорт сгенерирован автоматически*\n*Автор: `${user}` / `${id}`*";
-
 export enum GithubLabel { Mirror }
-
 export const githubLabels = { [GithubLabel.Mirror]: "☠️Слияние с ОФАМИ☠️" }
 
 export const SECONDS = 1000;
