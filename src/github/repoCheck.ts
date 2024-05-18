@@ -169,11 +169,9 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
     request: { fetch: customFetch }
   }).catch(async (e: any) => {
     const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
-    const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
-    await channel.send(
-      '<@!706124306660458507>\n'+
+    console.error(
       `Копирование [Pull Request #${pr.number}](<${pr.html_url}>) невозможно.\n`+
-      'Ошибка:\n```\n'+e.message+'\n```'
+      'Ошибка:\n'+e.message+''
     );
     process.exit(14);
   });
