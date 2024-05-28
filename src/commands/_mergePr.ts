@@ -18,6 +18,8 @@ export class MergeCommand {
       return;
     if (!prNumber)
       return;
+    if (!process.env["BASE_BRANCH"])
+      throw Error("Could not find BASE_BRANCH in your environment")
     if (!process.env["GET_REPO"])
       throw Error("Could not find GET_REPO in your environment")
     if (!process.env["REPORT_REPO"])
