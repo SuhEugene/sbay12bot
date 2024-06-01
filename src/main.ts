@@ -8,8 +8,11 @@ config();
 async function run() {
 
   const envsToCheck = [
-    "GITHUB_TOKEN", "BASE_REPO", "GET_REPO",
-    "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME"] as const;
+    "GITHUB_TOKEN",
+    "BASE_REPO", "GET_REPO",
+    "BASE_BRANCH", "GET_BRANCH",
+    "GIT_EMAIL", "GIT_NAME"
+  ] as const;
   for (const env of envsToCheck)
     if (!process.env[env])
       throw Error(`Could not find ${env} in your environment`);

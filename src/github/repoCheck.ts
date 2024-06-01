@@ -29,7 +29,7 @@ async function writeSinceDate(currentTime: Date) {
   await fs.writeFile(filePath, currentTime.toISOString(), "utf-8");
 }
 
-async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDate: Date) {
+async function getPRsToMerge(octo: Octokit, owner: string, repo: string, branch: string, sinceDate: Date) {
   const PRs: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"] = [];
 
   const prPaginator = octo.paginate.iterator(octo.pulls.list, {
@@ -43,8 +43,9 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
   for await (const page of prPaginator) {
     for (const pr of page.data) {
       if (new Date(pr.updated_at) <= sinceDate)  { end = true; break; }
-      if (pr.number == 33625) continue;
 
+      if (pr.base.ref !== branch)
+        continue;
       if (!pr.merged_at)
         continue;
       if (new Date(pr.merged_at) <= sinceDate)
@@ -63,13 +64,6 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
 function log(...args: any[]) {
   return console.log("=== GIT ===\n", ...args, "\n--- GIT ---")
 }
-
-type PRData = {
-  title: string,
-  body: null | string,
-  html_url: string,
-  number: number
-};
 
 function checkForCl(body = '', username = '') {
   if (!body || !username) return body;
@@ -90,6 +84,8 @@ export async function checkRepo() {
   const octo = shared.octokit;
   if (!octo) return;
 
+  if (!process.env["GET_BRANCH"])
+    throw Error("Could not find GET_BRANCH in your environment")
   if (!process.env["GET_REPO"])
     throw Error("Could not find GET_REPO in your environment")
   if (!process.env["BASE_BRANCH"])
@@ -118,7 +114,7 @@ export async function checkRepo() {
   await git.addConfig("user.name",  process.env["GIT_NAME"]);
 
   console.log(`[PRMERGE] Getting PRs to merge...`);
-  const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
+  const prs = await getPRsToMerge(octo, getOwner, getRepo, process.env["GET_BRANCH"], sinceDate);
 
   for (const pr of prs) {
     try {
