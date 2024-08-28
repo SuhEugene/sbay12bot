@@ -150,11 +150,11 @@ export async function checkRepo() {
 
   const repoExists = await git.checkIsRepo();
   if (!repoExists) {
-    await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath);
-    await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`);
+    await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath, [], log);
+    await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`, log);
   }
-  await git.addConfig("user.email", process.env["GIT_EMAIL"]);
-  await git.addConfig("user.name",  process.env["GIT_NAME"]);
+  await git.addConfig("user.email", process.env["GIT_EMAIL"], log);
+  await git.addConfig("user.name",  process.env["GIT_NAME"], log);
 
   console.log(`[PRMERGE] Getting PRs to merge...`);
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
