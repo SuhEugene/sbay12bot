@@ -182,8 +182,6 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
 
   const branchName = `upstream-pr-${pr.number}`;
   const patchFileName = path.join(repoPath, branchName+".patch");
-  console.log("[PRMERGE] Fetching everything...");
-  await git.fetch("", ["--all"], log);
 
   console.log(`[PRMERGE] Resetting everything...`);
   await git.reset(ResetMode.HARD, log);
