@@ -15,6 +15,7 @@ COPY ./tsconfig.json ./
 RUN pnpm build
 
 FROM base AS deps
+RUN apk add git
 COPY ./package.json ./pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --production
 
