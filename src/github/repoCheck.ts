@@ -4,7 +4,7 @@ import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import simpleGit, { CleanOptions, ResetMode } from "simple-git";
-import { RequestError } from "@octokit/request-error";
+import type { RequestError } from "@octokit/request-error";
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
 import fetch from "node-fetch";
@@ -188,7 +188,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
 
   console.log(`[PRMERGE] Checking out ${baseBranch}...`)
   await git.checkout(baseBranch);
-  
+
   console.log(`[PRMERGE] Pulling origin ${baseBranch}...`)
   await git.pull("origin", baseBranch);
   try {
@@ -321,7 +321,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
       });
     } catch (e) {console.error("Epic fail", e);}
     /////////////////////////////////
-    
+
     return myPr;
     // await sendToMirrorDiscord(myPr);
   } catch (e: any) {
