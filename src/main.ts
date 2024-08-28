@@ -66,8 +66,8 @@ bot.once("ready", async () => {
     throw Error(`Environment channel REPORT_CHANNEL (${process.env["REPORT_CHANNEL"]}) does not exist!`)
 
   const mirrorChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string);
-    if (!mirrorChannel || !mirrorChannel.id)
-      throw Error(`Environment channel MIRROR_CHANNEL (${process.env["MIRROR_CHANNEL"]}) does not exist!`)
+  if (!mirrorChannel || !mirrorChannel.id)
+    throw Error(`Environment channel MIRROR_CHANNEL (${process.env["MIRROR_CHANNEL"]}) does not exist!`)
 
   if (!process.env["ALLOWED_ROLES"])
     throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) does not exist!`)
@@ -82,14 +82,14 @@ bot.once("ready", async () => {
   readReports();
 
   console.log(
-    "=============\n"+
-    " Bot started\n"+
+    "=============\n" +
+    " Bot started\n" +
     "============="
   );
   console.log(` Logged in as:   ${bot.user.tag} [${bot.user.id}]`);
   console.log(` Report guild:   ${guild.name} [${guild.id}]`);
   console.log(` Report channel: #${reportChannel.name} [${reportChannel.id}]`);
-  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}:${process.env["BASE_BRANCH"]}${mstone && (', Milestone: '+ mstone)}`);
+  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}:${process.env["BASE_BRANCH"]}${mstone && (', Milestone: ' + mstone)}`);
   console.log(` Fetch GitHub:   ${process.env["GET_REPO"]}`);
 
   console.log(` Allowed roles:`);
@@ -102,7 +102,7 @@ bot.once("ready", async () => {
 
   console.log("=============");
 
-  setInterval(checkRepo, 5*MINUTES);
+  setInterval(checkRepo, 5 * MINUTES);
   checkRepo();
 });
 
@@ -112,7 +112,7 @@ bot.on("interactionCreate", (interaction: Interaction) => {
 
 bot.on("messageCreate", (message) => {
   if (message.channel.id === '903343634412359691')
-    try { message.react("<:PepeList:772558440803336192>"); } catch (e) {}
+    try { message.react("<:PepeList:772558440803336192>"); } catch (e) { }
   bot.executeCommand(message);
 })
 
@@ -122,7 +122,8 @@ async function run() {
   const envsToCheck = [
     "BOT_TOKEN", "GITHUB_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
     "MIRROR_CHANNEL", "REPORT_REPO", "GET_REPO", "ALLOWED_ROLES",
-    "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME", "DEFAULT_SINCE_TIMESTAMP"] as const;
+    "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME", "DEFAULT_SINCE_TIMESTAMP",
+    "HEAD_USER_MENTION"] as const;
   for (const env of envsToCheck)
     if (!process.env[env])
       throw Error(`Could not find ${env} in your environment`);

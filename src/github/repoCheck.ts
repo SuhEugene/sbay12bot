@@ -22,7 +22,7 @@ async function getSinceDate() {
   try {
     const got = await fs.readFile(filePath, "utf-8");
     if (got) sinceDate = new Date(got);
-  } catch (e) {}
+  } catch (e) { }
 
   return sinceDate;
 }
@@ -44,14 +44,14 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
   let end = false;
   for await (const page of prPaginator) {
     for (const pr of page.data) {
-      if (new Date(pr.updated_at) <= sinceDate)  { end = true; break; }
+      if (new Date(pr.updated_at) <= sinceDate) { end = true; break; }
       if (pr.number == 33625) continue;
 
       if (!pr.merged_at)
         continue;
       if (new Date(pr.merged_at) <= sinceDate)
         continue;
-      if(pr.title.startsWith("Bump actions/"))
+      if (pr.title.startsWith("Bump actions/"))
         continue;
 
       PRs.push(pr);
@@ -77,17 +77,17 @@ async function sendToMirrorDiscord(pr: PRData) {
   const embed = new EmbedBuilder()
     .setTitle(
       pr.title.length > 100
-      ? pr.title.substring(0, 97) + "..."
-      : pr.title
+        ? pr.title.substring(0, 97) + "..."
+        : pr.title
     )
     .setDescription(
       pr.body
-      ? (
-        pr.body.length > 1000
-        ? pr.body.substring(0, 997) + "..."
-        : pr.body
-      )
-      : "No description provided"
+        ? (
+          pr.body.length > 1000
+            ? pr.body.substring(0, 997) + "..."
+            : pr.body
+        )
+        : "No description provided"
     )
     .setColor(EMBED_COLOR_WARNING)
     .setURL(pr.html_url);
@@ -103,8 +103,8 @@ async function sendToMirrorDiscord(pr: PRData) {
   const row = getAcceptOrVoteMirrorRow(githubButton);
 
   const msg = await channel.send({
-    embeds: [ embed ],
-    components: [ row ]
+    embeds: [embed],
+    components: [row]
   });
 
   await mirrorPRs.push({ pr_number: pr.number, message: msg.id });
@@ -119,7 +119,7 @@ function checkForCl(body = '', username = '') {
   if (!match || !match.groups?.cl1) return body;
   if (match.groups.author?.trim()) return body;
 
-  console.log(">>> INSERTING AUTHOR "+username);
+  console.log(">>> INSERTING AUTHOR " + username);
 
   return body.replace(match[0], `${match.groups.cl1}${username}${match.groups.rest}`);
 }
@@ -140,11 +140,11 @@ export async function checkRepo() {
   if (!process.env["GIT_NAME"])
     throw Error("Could not find GIT_NAME in your environment")
 
-  const [ getOwner, getRepo ] = process.env["GET_REPO"].split("/");
-  const [ owner, repo ] = process.env["REPORT_REPO"].split("/");
+  const [getOwner, getRepo] = process.env["GET_REPO"].split("/");
+  const [owner, repo] = process.env["REPORT_REPO"].split("/");
 
   const sinceDate = await getSinceDate();
-  console.log("Checking repo "+process.env["GET_REPO"]);
+  console.log("Checking repo " + process.env["GET_REPO"]);
   console.log("Since:", sinceDate);
   console.log("At:", new Date());
 
@@ -157,7 +157,7 @@ export async function checkRepo() {
   }
   console.log("[PRMERGE] Setting git user...");
   await git.addConfig("user.email", process.env["GIT_EMAIL"], log);
-  await git.addConfig("user.name",  process.env["GIT_NAME"], log);
+  await git.addConfig("user.name", process.env["GIT_NAME"], log);
 
   console.log(`[PRMERGE] Getting PRs to merge...`);
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
@@ -178,10 +178,10 @@ export async function checkRepo() {
 
 const ERROR_SKIPLIST: string[] = [];
 export async function mergePr(octo: Octokit, owner: string, repo: string, baseBranch: string, pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
-  console.log("\n\n[PRMERGE] >>> PR NUMBER "+ pr.number)
+  console.log("\n\n[PRMERGE] >>> PR NUMBER " + pr.number)
 
   const branchName = `upstream-pr-${pr.number}`;
-  const patchFileName = path.join(repoPath, branchName+".patch");
+  const patchFileName = path.join(repoPath, branchName + ".patch");
 
   console.log(`[PRMERGE] Resetting everything...`);
   await git.reset(ResetMode.HARD, log);
@@ -210,9 +210,11 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
     const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
     const channel: TextChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
     await channel.send(
-      '<@!706124306660458507>\n'+
-      `Копирование [Pull Request #${pr.number}](<${pr.html_url}>) невозможно.\n`+
-      'Ошибка:\n```\n'+e.message+'\n```'
+      '## Ошибка получения патча\n' +
+      `<@${process.env.HEAD_USER_MENTION}>\n` +
+      `Копирование [Pull Request ${pr.base.repo.name}#${pr.number}](<${pr.html_url}>) невозможно.\n` +
+      'Ошибка:\n```\n' + e.message + '\n```\n' +
+      `-# Для повторной попытки копирования PR'а введи команду: \`${bot.prefix}merge ${pr.number}\``
     );
     process.exit(14);
   });
@@ -229,9 +231,9 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
 
     console.log(`[PRMERGE] Counting fails and successes...`);
     const fails = 0
-      + (e.message as string).split("error: patch failed").length-1
-      + (e.message as string).split("error: the patch applies to").length-1;
-    const successes = (e.message as string).split("Applied patch to").length-1;
+      + (e.message as string).split("error: patch failed").length - 1
+      + (e.message as string).split("error: the patch applies to").length - 1;
+    const successes = (e.message as string).split("Applied patch to").length - 1;
 
     let scssc = 0; // additional successes for binaries;
     const test = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
@@ -257,7 +259,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
   if (pr.user) {
     console.log(`[PRMERGE] Commiting with author...`);
     const u = pr.user;
-    await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, "--author", `${u.name||u.login} <${u.id}+${u.login}@users.noreply.github.com>`, log);
+    await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, "--author", `${u.name || u.login} <${u.id}+${u.login}@users.noreply.github.com>`, log);
   } else {
     console.log(`[PRMERGE] Commiting without author...`);
     await git.raw("commit", "-m", `[MIRROR] ${pr.title}`, log);
@@ -278,7 +280,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
         owner, repo, head: branchName, base: baseBranch,
         title: `[MIRROR] ${pr.title}`,
         body:
-          `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n`+
+          `# Оригинальный PR: ${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\n` +
           checkForCl(pr.body || '', pr.user?.login)
       })).data;
     } catch (e: any) {
@@ -288,16 +290,21 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
         if (e.message) {
           if (e.message.includes("No commits between")) {
             await channel.send(
-              '<@!706124306660458507>\n'+
-              `Изменения [Pull Request #${pr.number}](<${pr.html_url}>) полностью совпадают с текущей активной веткой.`+
-              '\nPR проигнорирован и требует ручной проверки.'
+              '## Ошибка создания PR\n' +
+              `<@${process.env.HEAD_USER_MENTION}>\n` +
+              `Изменения [Pull Request ${pr.base.repo.name}#${pr.number}](<${pr.html_url}>) полностью совпадают с текущей активной веткой.\n` +
+              'PR проигнорирован и требует ручной проверки.\n' +
+              `Вполне вероятно, что изменения \`${pr.base.repo.owner.login}/${pr.base.repo.name}#${pr.number}\` имеют слишком много конфликтов при слиянии с ${owner}/${repo}-${baseBranch}\n` +
+              `-# Для повторной попытки копирования PR'а введи команду: \`${bot.prefix}merge ${pr.number}\``
             );
             return;
           }
           await channel.send(
-            '<@!706124306660458507>\n'+
-            `Копирование [Pull Request #${pr.number}](<${pr.html_url}>) невозможно.\n`+
-            'Ошибка:\n```\n'+e.message+'\n```'
+            '## Ошибка создания PR\n' +
+            `<@${process.env.HEAD_USER_MENTION}>\n` +
+            `Копирование [Pull Request ${pr.base.repo.name}#${pr.number}](<${pr.html_url}>) невозможно.\n` +
+            'Ошибка:\n```\n' + e.message + '\n```\n' +
+            `-# Для повторной попытки копирования PR'а введи команду: \`${bot.prefix}merge ${pr.number}\``
           );
         }
         console.error("FATAL FATAL FATAL FATAL FATAL");
@@ -318,9 +325,9 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
     try {
       await shared.octokit?.issues.addLabels({
         owner, repo, issue_number: myPr.number,
-        labels: [ githubLabels[GithubLabel.Mirror] ]
+        labels: [githubLabels[GithubLabel.Mirror]]
       });
-    } catch (e) {console.error("Epic fail", e);}
+    } catch (e) { console.error("Epic fail", e); }
     /////////////////////////////////
 
     return myPr;
