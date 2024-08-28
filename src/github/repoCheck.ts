@@ -149,10 +149,13 @@ export async function checkRepo() {
   console.log("At:", new Date());
 
   const repoExists = await git.checkIsRepo();
+  console.log(`[PRMERGE] Repo ${repoExists ? "exists" : "does not exist"}`);
   if (!repoExists) {
-    await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath, [], log);
+    console.log("[PRMERGE] Cloning repo...");
+    await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath, [], console.log);
     await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`, log);
   }
+  console.log("[PRMERGE] Setting git user...");
   await git.addConfig("user.email", process.env["GIT_EMAIL"], log);
   await git.addConfig("user.name",  process.env["GIT_NAME"], log);
 
