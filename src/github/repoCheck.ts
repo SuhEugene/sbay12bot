@@ -18,7 +18,7 @@ function customFetch(url: string, options: Record<string, string>) {
 }
 
 async function getSinceDate() {
-  let sinceDate = new Date(1691154218000);
+  let sinceDate = new Date(parseInt(process.env["DEFAULT_SINCE_TIMESTAMP"] as string, 10));
   try {
     const got = await fs.readFile(filePath, "utf-8");
     if (got) sinceDate = new Date(got);

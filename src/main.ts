@@ -68,7 +68,7 @@ bot.once("ready", async () => {
   const mirrorChannel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string);
     if (!mirrorChannel || !mirrorChannel.id)
       throw Error(`Environment channel MIRROR_CHANNEL (${process.env["MIRROR_CHANNEL"]}) does not exist!`)
-  
+
   if (!process.env["ALLOWED_ROLES"])
     throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) does not exist!`)
 
@@ -122,10 +122,18 @@ async function run() {
   const envsToCheck = [
     "BOT_TOKEN", "GITHUB_TOKEN", "REPORT_GUILD", "REPORT_CHANNEL",
     "MIRROR_CHANNEL", "REPORT_REPO", "GET_REPO", "ALLOWED_ROLES",
-    "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME"] as const;
+    "BASE_BRANCH", "GIT_EMAIL", "GIT_NAME", "DEFAULT_SINCE_TIMESTAMP"] as const;
   for (const env of envsToCheck)
     if (!process.env[env])
       throw Error(`Could not find ${env} in your environment`);
+
+  const timestamp = parseInt(process.env["DEFAULT_SINCE_TIMESTAMP"] as string, 10);
+  if (!timestamp)
+    throw Error(`Environment variable DEFAULT_SINCE_TIMESTAMP (${process.env["DEFAULT_SINCE_TIMESTAMP"]}) is not a number!`)
+  if (timestamp <= 1691154218000)
+    throw Error(`Environment variable DEFAULT_SINCE_TIMESTAMP (${process.env["DEFAULT_SINCE_TIMESTAMP"]}) is too old!`)
+  if (!new Date(timestamp).getDate())
+    throw Error(`Environment variable DEFAULT_SINCE_TIMESTAMP (${process.env["DEFAULT_SINCE_TIMESTAMP"]}) is not a valid date!`)
 
   shared.octokit = new Octokit({
     auth: process.env["GITHUB_TOKEN"]
