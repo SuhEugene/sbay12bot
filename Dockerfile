@@ -1,36 +1,25 @@
-## build runner
-FROM node:lts-alpine as build-runner
-
-# Set temp directory
-WORKDIR /tmp/app
-
-# Move package.json
-COPY package.json .
-
-# Install dependencies
-RUN npm install
-
-# Move source files
-COPY src ./src
-COPY tsconfig.json   .
-
-# Build project
-RUN npm run build
-
-## production runner
-FROM node:lts-alpine as prod-runner
-
-# Set work directory
+FROM node:20-alpine AS base
 WORKDIR /app
 
-# Copy package.json from build-runner
-COPY --from=build-runner /tmp/app/package.json /app/package.json
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-# Install dependencies
-RUN npm install --omit=dev
+FROM base AS devdeps
+COPY ./package.json ./pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# Move build files
-COPY --from=build-runner /tmp/app/build /app/build
+FROM devdeps AS build
+COPY ./src ./src
+COPY ./tsconfig.json ./
+RUN pnpm build
 
-# Start bot
-CMD [ "npm", "run", "start" ]
+FROM base AS deps
+COPY ./package.json ./pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --production
+
+FROM deps as deploy
+COPY --from=build /app/build /app/build
+VOLUME ./repo /app/build/repo
+
+CMD pnpm start
