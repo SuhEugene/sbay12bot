@@ -18,8 +18,8 @@ FROM base AS deps
 COPY ./package.json ./pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --production
 
-FROM deps as deploy
+FROM deps AS deploy
 COPY --from=build /app/build /app/build
-VOLUME ./repo /app/build/repo
+VOLUME ./repo /app/repo
 
 CMD pnpm start
