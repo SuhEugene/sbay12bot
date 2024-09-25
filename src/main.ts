@@ -90,11 +90,13 @@ bot.once("ready", async () => {
     " Bot started\n" +
     "============="
   );
-  console.log(` Logged in as:   ${bot.user.tag} [${bot.user.id}]`);
-  console.log(` Report guild:   ${guild.name} [${guild.id}]`);
-  console.log(` Report channel: #${reportChannel.name} [${reportChannel.id}]`);
-  console.log(` Report GitHub:  ${process.env["REPORT_REPO"]}:${process.env["BASE_BRANCH"]}${mstone && (', Milestone: ' + mstone)}`);
-  console.log(` Fetch GitHub:   ${process.env["GET_REPO"]}`);
+  console.log(` Logged in as:      ${bot.user.tag} [${bot.user.id}]`);
+  console.log(` Report guild:      ${guild.name} [${guild.id}]`);
+  console.log(` Report channel:    #${reportChannel.name} [${reportChannel.id}]`);
+  console.log(` Mirror channel:    #${mirrorChannel.name} [${mirrorChannel.id}]`);
+  console.log(` Changelog channel: #${changelogChannel.name} [${changelogChannel.id}]`);
+  console.log(` Report GitHub:     ${process.env["REPORT_REPO"]}:${process.env["BASE_BRANCH"]}${mstone && (', Milestone: ' + mstone)}`);
+  console.log(` Fetch GitHub:      ${process.env["GET_REPO"]}`);
 
   console.log(` Allowed roles:`);
   for (const roleId of allowedRoles) {
