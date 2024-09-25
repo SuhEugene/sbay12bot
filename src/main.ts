@@ -69,6 +69,10 @@ bot.once("ready", async () => {
   if (!mirrorChannel || !mirrorChannel.id)
     throw Error(`Environment channel MIRROR_CHANNEL (${process.env["MIRROR_CHANNEL"]}) does not exist!`)
 
+  const changelogChannel = await guild.channels.fetch(process.env["CHANGELOG_CHANNEL"] as string);
+  if (!changelogChannel || !changelogChannel.id)
+    throw Error(`Environment channel CHANGELOG_CHANNEL (${process.env["CHANGELOG_CHANNEL"]}) does not exist!`)
+
   if (!process.env["ALLOWED_ROLES"])
     throw Error(`Environment role ALLOWED_ROLES (${process.env["ALLOWED_ROLES"]}) does not exist!`)
 
