@@ -38,7 +38,7 @@ export async function prOpenUpdate(data: PrOpenDataTypes) {
 
   try {
     const changelogChannel = await guild.channels.fetch(process.env["CHANGELOG_CHANNEL"] as string) as TextChannel;
-    if (pr.state === "closed")
+    if (status === "merged")
       await changelogChannel.send({ embeds: [ newEmbed ] })
   } catch (e) {
     console.error("UNCAUGHT! ERROR", e);
