@@ -156,8 +156,8 @@ export async function checkRepo() {
     await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`, log);
   }
   console.log("[PRMERGE] Setting git user...");
-  await git.addConfig("user.email", process.env["GIT_EMAIL"], log);
-  await git.addConfig("user.name", process.env["GIT_NAME"], log);
+  await git.addConfig("user.email", process.env["GIT_EMAIL"]);
+  await git.addConfig("user.name", process.env["GIT_NAME"]);
 
   console.log(`[PRMERGE] Getting PRs to merge...`);
   const prs = await getPRsToMerge(octo, getOwner, getRepo, sinceDate);
