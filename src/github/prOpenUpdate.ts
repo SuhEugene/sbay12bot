@@ -22,7 +22,7 @@ export async function prOpenUpdate(data: PrOpenDataTypes) {
 
   const guild = await bot.guilds.fetch(process.env["REPORT_GUILD"] as string);
   const channel = await guild.channels.fetch(process.env["MIRROR_CHANNEL"] as string) as TextChannel;
-  
+
   console.log(`PR #${pr.number} is ${status} now`);
 
   const msg = await getMessageByPr(pr.number);
@@ -35,6 +35,14 @@ export async function prOpenUpdate(data: PrOpenDataTypes) {
   await unmergedPRs.write();
   if (pr.state != "closed")
     await unmergedPRs.push({ pr_number: pr.number, message: sentMsg.id });
+
+  try {
+    const changelogChannel = await guild.channels.fetch(process.env["CHANGELOG_CHANNEL"] as string) as TextChannel;
+    if (pr.state === "closed")
+      await changelogChannel.send({ embeds: [ newEmbed ] })
+  } catch (e) {
+    console.error("UNCAUGHT! ERROR", e);
+  }
 
   return true;
 };
