@@ -148,13 +148,18 @@ export async function checkRepo() {
   console.log("Since:", sinceDate);
   console.log("At:", new Date());
 
-  const repoExists = await git.checkIsRepo();
+  let repoExists = false;
+  try {
+    repoExists = await git.checkIsRepo();
+  } catch (e) {
+    await git.addConfig("safe.directory", repoPath, false, GitConfigScope.global, log);
+    throw "FATAL - Trying to add safe.directory and shall restart";
+  }
   console.log(`[PRMERGE] Repo ${repoExists ? "exists" : "does not exist"}`);
   if (!repoExists) {
     console.log("[PRMERGE] Cloning repo...");
     await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath, [], console.log);
   }
-  await git.addConfig("safe.directory", repoPath, false, GitConfigScope.global, log);
   try {
     await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`, log);
   } catch (e) {}
