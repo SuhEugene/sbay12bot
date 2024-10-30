@@ -3,7 +3,7 @@ import { EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabel
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
-import simpleGit, { CleanOptions, ResetMode } from "simple-git";
+import simpleGit, { CleanOptions, GitConfigScope, ResetMode } from "simple-git";
 import type { RequestError } from "@octokit/request-error";
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
@@ -153,8 +153,11 @@ export async function checkRepo() {
   if (!repoExists) {
     console.log("[PRMERGE] Cloning repo...");
     await git.clone(`https://github.com/${owner}/${repo}.git`, repoPath, [], console.log);
-    await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`, log);
   }
+  await git.addConfig("safe.directory", repoPath, false, GitConfigScope.global, log);
+  try {
+    await git.addRemote("upstream", `https://github.com/${getOwner}/${getRepo}.git`, log);
+  } catch (e) {}
   console.log("[PRMERGE] Setting git user...");
   await git.addConfig("user.email", process.env["GIT_EMAIL"]);
   await git.addConfig("user.name", process.env["GIT_NAME"]);
