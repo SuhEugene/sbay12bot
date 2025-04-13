@@ -1,7 +1,7 @@
-import { EmbedBuilder, ModalSubmitInteraction } from "discord.js";
-import { EMBED_COLOR_DEFAULT, ReportFieldId, reportTitlePrefixes, ReportType, ReportTypedData, sendOrAddInfoReportRow, shared } from "../shared.js";
+import { ModalSubmitInteraction } from "discord.js";
+import { ReportFieldId, ReportType, ReportTypedData, shared } from "../shared.js";
 import { replyToInteraction } from "../utils/reply.js";
-import { sessionToText } from "../utils/sessionToText.js";
+import { sendSessionEmbed } from "../utils/sendSessionEmbed.js";
 
 export async function onReportModal(interaction: ModalSubmitInteraction, type?: ReportType) {
   const reportFields: {[index: string]: any} = {};
@@ -24,16 +24,5 @@ export async function onReportModal(interaction: ModalSubmitInteraction, type?: 
 
   shared.reportSessions[interaction.user.id] = session;
 
-  const embed = new EmbedBuilder().setColor(EMBED_COLOR_DEFAULT);
-
-  session[ReportFieldId.Title] &&
-    embed.setTitle(`${reportTitlePrefixes[session.type]}: ${session[ReportFieldId.Title]}`);
-
-  embed.setDescription(sessionToText(session));
-  
-  return await replyToInteraction(interaction, {
-    embeds: [ embed ],
-    components: [ sendOrAddInfoReportRow ],
-    ephemeral: true
-  });
+  return await sendSessionEmbed(interaction, session);
 }

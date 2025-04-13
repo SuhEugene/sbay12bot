@@ -58,7 +58,7 @@ const sendReportButton = new ButtonBuilder()
   .setStyle(ButtonStyle.Primary)
   .setCustomId(ButtonId.ReportSend);
 
-  const addAdditionalInfo = new ButtonBuilder()
+const addAdditionalInfo = new ButtonBuilder()
   .setLabel("Отмена")
   .setEmoji("❌")
   .setStyle(ButtonStyle.Secondary)
