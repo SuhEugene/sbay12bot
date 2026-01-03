@@ -44,8 +44,10 @@ bot.once("ready", async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
 
+  console.log("Initializing application commands...");
   // Synchronize applications commands with Discord
   await bot.initApplicationCommands();
+  console.log("Application commands initialized!");
 
   // To clear all guild commands, uncomment this line,
   // This is useful when moving from guild commands to global commands
