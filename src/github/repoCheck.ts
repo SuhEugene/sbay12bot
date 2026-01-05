@@ -3,7 +3,7 @@ import { EMBED_COLOR_WARNING, GithubLabel, getAcceptOrVoteMirrorRow, githubLabel
 import path from "path";
 import { cwd } from "process";
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
-import simpleGit, { CleanOptions, GitConfigScope, ResetMode } from "simple-git";
+import simpleGit, { CleanOptions, GitConfigScope, GitError, ResetMode } from "simple-git";
 import type { RequestError } from "@octokit/request-error";
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { bot } from "../main.js";
@@ -63,6 +63,14 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
 }
 
 function log(...args: any[]) {
+  if (args.length > 0) {
+    if (args[0] instanceof GitError) {
+      const err = args[0] as GitError;
+      if (err.message.includes("remote upstream already exists")) {
+        return;
+      }
+    }
+  }
   return console.log("=== GIT ===\n", ...args, "\n--- GIT ---")
 }
 
