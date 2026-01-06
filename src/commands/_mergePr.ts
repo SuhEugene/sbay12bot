@@ -14,7 +14,11 @@ export class MergeCommand {
     prNumber: number | undefined,
     command: SimpleCommandMessage
   ) {
-    if (command.message.author.id !== "200682967775969280")
+    if (
+      command.message.author.id !== "706124306660458507" && // SuhEugene
+      command.message.author.id !== "384405124258201601" && // Voiko
+      command.message.author.id !== "286536768726237185"    // LordNest
+    )
       return;
     if (!prNumber)
       return;
@@ -57,4 +61,3 @@ export class MergeCommand {
 
   }
 }
-
