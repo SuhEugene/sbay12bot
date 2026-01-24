@@ -51,7 +51,7 @@ async function getPRsToMerge(octo: Octokit, owner: string, repo: string, sinceDa
         continue;
       if (new Date(pr.merged_at) <= sinceDate)
         continue;
-      if (pr.title.startsWith("Bump actions/"))
+      if (pr.user?.login == "dependabot[bot]" || pr.user?.id === 49699333)
         continue;
 
       PRs.push(pr);
