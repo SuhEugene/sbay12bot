@@ -3,6 +3,7 @@ import { Discord, Guard, SimpleCommand, SimpleCommandMessage, SimpleCommandOptio
 import { shared } from "../shared.js";
 import { mergePr } from "../github/repoCheck.js";
 import { RestEndpointMethodTypes } from "@octokit/rest";
+import { sanitOut } from "../utils/sanitOut.js";
 
 @Discord()
 @Guard(NotBot)
@@ -14,6 +15,7 @@ export class MergeCommand {
     prNumber: number | undefined,
     command: SimpleCommandMessage
   ) {
+    const reply = (msg: string) => command.message.reply(sanitOut(msg));
     if (
       command.message.author.id !== "706124306660458507" && // SuhEugene
       command.message.author.id !== "384405124258201601" && // Voiko
@@ -39,7 +41,7 @@ export class MergeCommand {
       pr = await octo.pulls.get({ owner, repo, pull_number: prNumber });
     } catch (e) {
       if (e instanceof Error)
-        command.message.reply(`Невозможно найти PR:\`\`\`\n${e.message}\n\`\`\``);
+        reply(`Невозможно найти PR:\`\`\`\n${e.message}\n\`\`\``);
     }
 
     if (!pr) return;
@@ -52,10 +54,10 @@ export class MergeCommand {
     try {
       const myPr = await mergePr(octo, realOwner, realRepo, process.env["BASE_BRANCH"], pr.data as RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0])
       if (!myPr) throw Error("Неизвестная ошибка! PR не существует!");
-      command.message.reply(`PR успешно создан: ${Date.now() - command.message.createdTimestamp}ms\n<${myPr.html_url}>`);
+      reply(`PR успешно создан: ${Date.now() - command.message.createdTimestamp}ms\n<${myPr.html_url}>`);
     } catch (e) {
       if (e instanceof Error)
-        command.message.reply(`Невозможно создать PR:\`\`\`\n${e.message}\n\`\`\``);
+        reply(`Невозможно создать PR:\`\`\`\n${e.message}\n\`\`\``);
       throw e;
     }
 

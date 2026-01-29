@@ -9,7 +9,6 @@ import { readReports } from "./utils/githubReports.js";
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 import { createServer } from "http";
 import { checkRepo } from "./github/repoCheck.js";
-import path, { normalize } from "path";
 
 config();
 

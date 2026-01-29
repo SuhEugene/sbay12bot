@@ -1,6 +1,7 @@
 import { GuildMember, TextChannel, ThreadChannel } from "discord.js";
 import { Discord, SimpleCommand, SimpleCommandMessage, SimpleCommandOption, SimpleCommandOptionType } from "discordx";
 import { mirrorAccept } from "../utils/mirrorTools.js";
+import { sanitOut } from "../utils/sanitOut.js";
 
 @Discord()
 export class GHMirror {
@@ -40,7 +41,7 @@ export class GHMirror {
 
     const error = await mirrorAccept(msg, command.message.author);
     if (error)
-      return command.message.reply("Ошибка! "+error);
+      return command.message.reply(sanitOut("Ошибка! "+error));
 
     return await command.message.react("✅");
   }

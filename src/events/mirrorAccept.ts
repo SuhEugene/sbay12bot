@@ -3,6 +3,7 @@ import { ButtonId, EMBED_COLOR_SUCCESS, GithubLabel, githubLabels, mirrorPRs, sh
 import { APIEmbed, ButtonInteraction, EmbedBuilder } from "discord.js";
 import { replyToInteraction } from "../utils/reply.js";
 import { mirrorAccept } from "../utils/mirrorTools.js";
+import { sanitOut } from "../utils/sanitOut.js";
 
 @Discord()
 export class MirrorAccept {
@@ -15,7 +16,7 @@ export class MirrorAccept {
 
     const error = await mirrorAccept(interaction.message, interaction.user);
     if (error) return await replyToInteraction(interaction, {
-      content: "Ошибка! "+error,
+      content: sanitOut("Ошибка! "+error),
       ephemeral: true
     });
 
