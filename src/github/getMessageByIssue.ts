@@ -9,7 +9,7 @@ export async function getMessageByIssue(issueNumber: number) {
 
   await readReports();
   const messageId = reportsMap.get(issueNumber);
-  if (!messageId) return;
+  if (!messageId) return console.warn("Reports map has no issue number", issueNumber);
 
   const msg = await channel.messages.fetch(messageId);
   if (!msg) throw Error(`Message ${messageId} does not exist!`);
