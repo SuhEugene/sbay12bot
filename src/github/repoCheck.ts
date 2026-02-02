@@ -189,7 +189,7 @@ export async function checkRepo() {
     console.log(`[PRMERGE] Writing since date...`);
     await writeSinceDate(new Date(pr.updated_at));
   }
-  console.log("Check successfull!")
+  console.log("Check successful!")
 }
 
 const ERROR_SKIPLIST: string[] = [];
