@@ -5,7 +5,7 @@ import { getMessageByIssue } from "./getMessageByIssue.js";
 
 export async function issueComment(data: EmitterWebhookEvent<"issue_comment.created">) {
   const issueNumber = data.payload.issue.number;
-  const commentURL = data.payload.comment.url;
+  const commentURL = data.payload.comment.html_url;
   const commentText = data.payload.comment.body;
   const commentSender = data.payload.comment.user;
   if (commentSender.id == 125094432) return;
