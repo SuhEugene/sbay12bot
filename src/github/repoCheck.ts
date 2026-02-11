@@ -236,10 +236,11 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
       '## Ошибка получения патча\n' +
       `<@${process.env.HEAD_USER_MENTION}>\n` +
       `Копирование [Pull Request ${pr.base.repo.name}#${pr.number}](<${pr.html_url}>) невозможно.\n` +
+      "Проблемы с соединением с GitHub или на стороне GitHub произошла внутренняя ошибка.\n" +
       'Ошибка:\n```\n' + getLongError(e.message) + '\n```\n' +
       `-# Для повторной попытки копирования PR'а введи команду: \`${bot.prefix}merge ${pr.number}\``
     );
-    process.exit(14);
+    await new Promise((resolve) => setTimeout(resolve, 15000));
   });
   if (!patch)
     throw new Error("Патч отсутствует");
