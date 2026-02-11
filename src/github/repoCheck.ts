@@ -192,6 +192,13 @@ export async function checkRepo() {
   console.log("Check successful!")
 }
 
+function getLongError(text: string) {
+  if (text.length <= 1000) return text;
+  const id = Date.now();
+  console.log(id, text);
+  return text.slice(0, 1000) + `... (Полная причина: ${id})`;
+}
+
 const ERROR_SKIPLIST: string[] = [];
 export async function mergePr(octo: Octokit, owner: string, repo: string, baseBranch: string, pr: RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]) {
   console.log("\n\n[PRMERGE] >>> PR NUMBER " + pr.number)
@@ -229,7 +236,7 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
       '## Ошибка получения патча\n' +
       `<@${process.env.HEAD_USER_MENTION}>\n` +
       `Копирование [Pull Request ${pr.base.repo.name}#${pr.number}](<${pr.html_url}>) невозможно.\n` +
-      'Ошибка:\n```\n' + e.message + '\n```\n' +
+      'Ошибка:\n```\n' + getLongError(e.message) + '\n```\n' +
       `-# Для повторной попытки копирования PR'а введи команду: \`${bot.prefix}merge ${pr.number}\``
     );
     process.exit(14);
