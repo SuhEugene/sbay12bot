@@ -253,27 +253,28 @@ export async function mergePr(octo: Octokit, owner: string, repo: string, baseBr
     await git.raw("apply", "--3way", "--binary", "--apply", patchFileName, log)
   } catch (e: any) {
 
-    console.log(`[PRMERGE] Counting fails and successes...`);
-    const fails = 0
-      + (e.message as string).split("error: patch failed").length - 1
-      + (e.message as string).split("error: the patch applies to").length - 1;
-    const successes = (e.message as string).split("Applied patch to").length - 1;
+    // console.log(`[PRMERGE] Counting fails and successes...`);
+    // const fails = 0
+    //   + (e.message as string).split("error: patch failed").length - 1
+    //   + (e.message as string).split("error: the patch applies to").length - 1;
+    // const successes = (e.message as string).split("Applied patch to").length - 1;
 
+    console.log(`[PRMERGE] Trying to checkout their binary files...`);
     let scssc = 0; // additional successes for binaries;
-    const test = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
-    for (const el of test) {
+    const binaryFiles = (e.message as string).matchAll(/warning: Cannot merge binary files: ([^(]+)\(ours vs. theirs\)/g);
+    for (const el of binaryFiles) {
       const path = el[1].trim();
       console.log(`[PRMERGE] Checking out theirs binary ${path}...`);
       await git.checkout(path, ["--theirs"]);
       scssc++;
     }
 
-    if (fails > successes || !successes) {
-      await git.reset(ResetMode.HARD, log);
-      console.error("Patch couldn't be applied!\n\n", e);
-      console.error(`(Fails: ${fails}) > (Successes: ${successes})`);
-      return;
-    }
+    // if (fails > successes || !successes) {
+    //   await git.reset(ResetMode.HARD, log);
+    //   console.error("Patch couldn't be applied!\n\n", e);
+    //   console.error(`(Fails: ${fails}) > (Successes: ${successes})`);
+    //   return;
+    // }
   }
   console.log(`[PRMERGE] Deleting patch file...`);
   await fs.unlink(patchFileName);
