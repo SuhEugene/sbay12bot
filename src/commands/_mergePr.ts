@@ -53,12 +53,15 @@ export class MergeCommand {
     // "as" because someone coded labels через жопу блять
     try {
       const myPr = await mergePr(octo, realOwner, realRepo, process.env["BASE_BRANCH"], pr.data as RestEndpointMethodTypes["pulls"]["list"]["response"]["data"][0]);
-      if (!myPr) throw Error("Неизвестная ошибка! PR не существует!");
+      if (!myPr) {
+        reply("PR не создан. Причина должна быть описана отдельным сообщением.");
+        return;
+      }
       reply(`PR успешно создан: ${Date.now() - command.message.createdTimestamp}ms\n<${myPr.html_url}>`);
     } catch (e) {
       if (e instanceof Error)
         reply(`Невозможно создать PR:\`\`\`\n${e.message}\n\`\`\``);
-      throw e;
+      // throw e;
     }
 
   }
