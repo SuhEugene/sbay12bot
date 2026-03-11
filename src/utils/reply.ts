@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, InteractionReplyOptions, InteractionResponse, Message, MessageReplyOptions, ModalSubmitInteraction } from "discord.js"
+import { ButtonInteraction, CommandInteraction, InteractionEditReplyOptions, InteractionReplyOptions, InteractionResponse, Message, MessageReplyOptions, ModalSubmitInteraction } from "discord.js"
 import { SimpleCommandMessage } from "discordx"
 
 /**
@@ -34,7 +34,7 @@ export async function replyToInteraction(
  */
 export async function editOrReply(
   interaction: CommandInteraction | ModalSubmitInteraction | ButtonInteraction,
-  message: string | (InteractionReplyOptions)
+  message: string | (InteractionReplyOptions & InteractionEditReplyOptions)
 ): Promise<Message<boolean> | InteractionResponse<boolean>> {
   
   if (interaction.replied)
